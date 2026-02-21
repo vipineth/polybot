@@ -2,12 +2,12 @@ use crate::api::PolymarketApi;
 use anyhow::Result;
 use chrono::{TimeZone, Timelike};
 use chrono_tz::America::New_York;
+use log::info;
 use std::sync::Arc;
 
-pub const MARKET_15M_DURATION_SECS: i64 = 15 * 60; // 900
 pub const MARKET_5M_DURATION_SECS: i64 = 5 * 60;  // 300
 
-/// Polymarket aligns 15m/5m markets to Eastern Time (ET). Period start = start of current window in ET, as Unix timestamp.
+/// Polymarket aligns 5m markets to Eastern Time (ET). Period start = start of current window in ET, as Unix timestamp.
 fn period_start_et_unix(minutes: i64) -> i64 {
     let utc_now = chrono::Utc::now();
     let et = New_York;
@@ -25,19 +25,9 @@ fn period_start_et_unix(minutes: i64) -> i64 {
     dt_et.timestamp()
 }
 
-/// BTC 15m slug: btc-updown-15m-{timestamp}
-pub fn build_15m_slug(period_start_unix: i64) -> String {
-    format!("btc-updown-15m-{}", period_start_unix)
-}
-
 /// 5m slug for any symbol: {symbol}-updown-5m-{timestamp} (e.g. btc, eth, sol, xrp).
 pub fn build_5m_slug(symbol: &str, period_start_unix: i64) -> String {
     format!("{}-updown-5m-{}", symbol.to_lowercase(), period_start_unix)
-}
-
-/// Current 15-minute period start (Unix). Aligned to 15m boundaries in Eastern Time (Polymarket uses ET).
-pub fn current_15m_period_start() -> i64 {
-    period_start_et_unix(15)
 }
 
 /// Current 5-minute period start (Unix). Aligned to 5m boundaries in Eastern Time (Polymarket uses ET).
@@ -64,12 +54,6 @@ pub fn period_start_et_unix_for_timestamp(ts_sec: i64, minutes: i64) -> i64 {
         .or_else(|| et.from_local_datetime(&truncated_naive).earliest())
         .expect("ET period for timestamp");
     dt_et.timestamp()
-}
-
-/// True when we're in the last 5 minutes of the current 15m market (overlap with 5m for arb).
-pub fn is_last_5min_of_15m(now_ts: i64, period_15m_start: i64) -> bool {
-    let elapsed = now_ts - period_15m_start;
-    elapsed >= 10 * 60 && elapsed < 15 * 60 // 600..900 sec
 }
 
 /// Parse price-to-beat from market question (e.g. "Will Bitcoin be above $97,500 at ...").
@@ -128,20 +112,6 @@ impl MarketDiscovery {
         Ok((up, down))
     }
 
-    /// Fetch BTC 15m market by period start; returns condition_id and price-to-beat if parseable.
-    pub async fn get_15m_market(&self, period_start: i64) -> Result<Option<(String, Option<f64>)>> {
-        let slug = build_15m_slug(period_start);
-        let market = match self.api.get_market_by_slug(&slug).await {
-            Ok(m) => m,
-            Err(_) => return Ok(None),
-        };
-        if !market.active || market.closed {
-            return Ok(None);
-        }
-        let price_to_beat = parse_price_to_beat_from_question(&market.question);
-        Ok(Some((market.condition_id, price_to_beat)))
-    }
-
     /// Fetch 5m market by symbol and period start; returns condition_id and price-to-beat if parseable.
     pub async fn get_5m_market(&self, symbol: &str, period_start: i64) -> Result<Option<(String, Option<f64>)>> {
         let slug = build_5m_slug(symbol, period_start);
@@ -153,6 +123,9 @@ impl MarketDiscovery {
             return Ok(None);
         }
         let price_to_beat = parse_price_to_beat_from_question(&market.question);
+        if price_to_beat.is_none() {
+            info!("Could not parse price-to-beat from question: {:?}", market.question);
+        }
         Ok(Some((market.condition_id, price_to_beat)))
     }
 }

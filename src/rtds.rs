@@ -8,6 +8,7 @@ use anyhow::{Context, Result};
 use futures_util::{SinkExt, StreamExt};
 use log::{info, warn};
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use tokio::time::{interval, Duration};
@@ -55,13 +56,14 @@ where
 #[derive(Debug, Deserialize)]
 struct ChainlinkMessage {
     topic: Option<String>,
-    #[serde(rename = "type")]
-    msg_type: Option<String>,
     payload: Option<ChainlinkPayload>,
 }
 
 /// Map symbol (e.g. "btc") -> period_start -> price-to-beat.
-pub type PriceCacheMulti = Arc<RwLock<std::collections::HashMap<String, std::collections::HashMap<i64, f64>>>>;
+pub type PriceCacheMulti = Arc<RwLock<HashMap<String, HashMap<i64, f64>>>>;
+
+/// Latest price per symbol: symbol -> (latest_price_usd, timestamp_ms).
+pub type LatestPriceCache = Arc<RwLock<HashMap<String, (f64, i64)>>>;
 
 /// RTDS symbol to feed symbol (e.g. btc -> btc/usd).
 fn rtds_feed_symbol(symbol: &str) -> String {
@@ -80,20 +82,21 @@ fn payload_symbol_to_key(s: &str) -> Option<String> {
 
 /// Connect to Polymarket RTDS, subscribe to crypto_prices_chainlink for given symbols.
 /// When feed_ts is in [period_start, period_start+2), set price-to-beat for that (symbol, period).
+/// Also updates latest_prices on every incoming message for post-close sweep.
 pub async fn run_rtds_chainlink_multi(
     ws_url: &str,
     symbols: &[String],
-    price_cache_15: PriceCacheMulti,
     price_cache_5: PriceCacheMulti,
+    latest_prices: LatestPriceCache,
 ) -> Result<()> {
     let url = ws_url.trim_end_matches('/');
     let symbol_set: std::collections::HashSet<String> = symbols.iter().map(|s| s.to_lowercase()).collect();
     info!(
-        "RTDS connecting: {} (topic: crypto_prices_chainlink, symbols: {:?})",
+        "RTDS WS connecting: {} (symbols: {:?})",
         url, symbols
     );
 
-    let (mut ws_stream, _) = connect_async(url).await.context("RTDS connect failed")?;
+    let (mut ws_stream, _) = connect_async(url).await.context("RTDS WS connect failed")?;
     let subscriptions: Vec<serde_json::Value> = symbols
         .iter()
         .map(|s| {
@@ -112,8 +115,8 @@ pub async fn run_rtds_chainlink_multi(
     ws_stream
         .send(Message::Text(sub.to_string()))
         .await
-        .context("RTDS send subscribe failed")?;
-    info!("RTDS subscribed to {} symbols", symbols.len());
+        .context("RTDS WS subscribe failed")?;
+    info!("RTDS WS subscribed to {} symbols", symbols.len());
 
     let mut ping = interval(Duration::from_secs(PING_INTERVAL_SECS));
     ping.tick().await;
@@ -121,7 +124,7 @@ pub async fn run_rtds_chainlink_multi(
     loop {
         tokio::select! {
             Some(msg) = ws_stream.next() => {
-                let msg = msg.context("RTDS stream error")?;
+                let msg = msg.context("RTDS WS stream error")?;
                 match msg {
                     Message::Text(text) => {
                         if let Ok(m) = serde_json::from_str::<ChainlinkMessage>(&text) {
@@ -131,25 +134,18 @@ pub async fn run_rtds_chainlink_multi(
                                         Some(k) if symbol_set.contains(&k) => k,
                                         _ => continue,
                                     };
+                                    // Always update latest price cache (for post-close sweep)
+                                    latest_prices.write().await.insert(key.clone(), (p.value, p.timestamp));
+
                                     let ts_sec = p.timestamp / 1000;
-                                    let period_15 = period_start_et_unix_for_timestamp(ts_sec, 15);
                                     let period_5 = period_start_et_unix_for_timestamp(ts_sec, 5);
-                                    let in_capture_15 = ts_sec >= period_15 && ts_sec < period_15 + FEED_TS_CAPTURE_WINDOW_SECS;
                                     let in_capture_5 = ts_sec >= period_5 && ts_sec < period_5 + FEED_TS_CAPTURE_WINDOW_SECS;
-                                    if in_capture_15 {
-                                        let mut cache = price_cache_15.write().await;
-                                        let per_symbol = cache.entry(key.clone()).or_default();
-                                        if !per_symbol.contains_key(&period_15) {
-                                            per_symbol.insert(period_15, p.value);
-                                            info!("RTDS Chainlink price-to-beat 15m {}: period {} -> {:.2} USD (feed_ts={})", key, period_15, p.value, ts_sec);
-                                        }
-                                    }
                                     if in_capture_5 {
                                         let mut cache = price_cache_5.write().await;
                                         let per_symbol = cache.entry(key.clone()).or_default();
                                         if !per_symbol.contains_key(&period_5) {
                                             per_symbol.insert(period_5, p.value);
-                                            info!("RTDS Chainlink price-to-beat 5m {}: period {} -> {:.2} USD (feed_ts={})", key, period_5, p.value, ts_sec);
+                                            info!("RTDS WS price-to-beat 5m {}: period {} -> {:.2} USD (feed_ts={})", key, period_5, p.value, ts_sec);
                                         }
                                     }
                                 }
@@ -170,6 +166,6 @@ pub async fn run_rtds_chainlink_multi(
             }
         }
     }
-    warn!("RTDS connection closed");
+    warn!("RTDS WS connection closed");
     Ok(())
 }

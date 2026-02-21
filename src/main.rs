@@ -3,9 +3,10 @@ mod chainlink;
 mod config;
 mod discovery;
 mod models;
+mod paper_trade;
 mod rtds;
 mod strategy;
-mod ws;
+
 
 use anyhow::Result;
 use clap::Parser;
@@ -25,17 +26,14 @@ async fn main() -> Result<()> {
     let args = Args::parse();
     let config = Config::load(&args.config)?;
 
-    eprintln!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-    eprintln!("📋 5m pre-order trading bot (BTC, ETH, SOL, XRP)");
+    eprintln!("----------------------------------------------------");
+    eprintln!("5m post-close sweep bot (BTC, ETH, SOL, XRP)");
     eprintln!("   Price-to-beat: RTDS Chainlink per symbol for 5m period");
-    eprintln!("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    eprintln!("----------------------------------------------------");
 
     let api = Arc::new(PolymarketApi::new(
         config.polymarket.gamma_api_url.clone(),
         config.polymarket.clob_api_url.clone(),
-        config.polymarket.api_key.clone(),
-        config.polymarket.api_secret.clone(),
-        config.polymarket.api_passphrase.clone(),
         config.polymarket.private_key.clone(),
         config.polymarket.proxy_wallet_address.clone(),
         config.polymarket.signature_type,
@@ -95,7 +93,7 @@ async fn run_redeem_only(
     let mut fail_count = 0u32;
     for cid in &cids {
         eprintln!("\n--- Redeeming condition {} ---", &cid[..cid.len().min(18)]);
-        match api.redeem_tokens(cid, "", "Up").await {
+        match api.redeem_tokens(cid, "Up").await {
             Ok(_) => {
                 eprintln!("Success: {}", cid);
                 ok_count += 1;

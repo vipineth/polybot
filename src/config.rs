@@ -21,57 +21,57 @@ pub struct Config {
     pub strategy: StrategyConfig,
 }
 
-/// 5m pre-order trading: symbols to trade, pre-order size/side/improvement.
+/// 5m post-close sweep: symbols to trade, sweep parameters.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StrategyConfig {
     /// 5m market symbols (e.g. btc, eth, sol, xrp). Slug format: {symbol}-updown-5m-{period}.
     #[serde(default = "default_symbols")]
     pub symbols: Vec<String>,
-    /// Max sum of (15m one side ask + 5m opposite side ask) to trigger arb (e.g. 0.99).
-    #[serde(default = "default_sum_threshold")]
-    pub sum_threshold: f64,
-    /// Seconds to wait after placing orders before checking if both filled.
-    #[serde(default = "default_verify_fill_secs")]
-    pub verify_fill_secs: u64,
     #[serde(default)]
     pub simulation_mode: bool,
-    /// Enable pre-order: place one limit buy per 5m market per period.
+    /// Enable post-close sweep: buy winning tokens from stale limit orders after market closes.
     #[serde(default)]
-    pub pre_order_enabled: bool,
-    /// Pre-order size in shares (e.g. "10").
-    #[serde(default = "default_pre_order_size")]
-    pub pre_order_size: String,
-    /// Pre-order side: "up", "down", or "favor" (side the market currently favors).
-    #[serde(default = "default_pre_order_side")]
-    pub pre_order_side: String,
-    /// Ticks to improve vs best ask (1 tick = 0.01). 0 = use best ask.
-    #[serde(default)]
-    pub pre_order_improve_ticks: u32,
+    pub sweep_enabled: bool,
+    /// Max ask price to buy winning tokens (e.g. 0.995 = pay at most 99.5c for a $1 token).
+    #[serde(default = "default_sweep_max_price")]
+    pub sweep_max_price: f64,
+    /// Min USD difference between latest price and price-to-beat to trigger sweep.
+    #[serde(default = "default_sweep_min_margin")]
+    pub sweep_min_margin: f64,
+    /// Seconds to sweep before giving up.
+    #[serde(default = "default_sweep_timeout_secs")]
+    pub sweep_timeout_secs: u64,
+    /// Size per FOK buy order (shares).
+    #[serde(default = "default_sweep_order_size")]
+    pub sweep_order_size: String,
+    /// Milliseconds between FOK orders.
+    #[serde(default = "default_sweep_inter_order_delay_ms")]
+    pub sweep_inter_order_delay_ms: u64,
 }
 
 fn default_symbols() -> Vec<String> {
     vec!["btc".into(), "eth".into(), "sol".into(), "xrp".into()]
 }
-fn default_sum_threshold() -> f64 {
-    0.99
+fn default_sweep_max_price() -> f64 {
+    0.995
 }
-fn default_verify_fill_secs() -> u64 {
-    10
+fn default_sweep_min_margin() -> f64 {
+    5.0
 }
-fn default_pre_order_size() -> String {
-    "10".to_string()
+fn default_sweep_timeout_secs() -> u64 {
+    30
 }
-fn default_pre_order_side() -> String {
-    "favor".to_string()
+fn default_sweep_order_size() -> String {
+    "100".to_string()
+}
+fn default_sweep_inter_order_delay_ms() -> u64 {
+    50
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PolymarketConfig {
     pub gamma_api_url: String,
     pub clob_api_url: String,
-    pub api_key: Option<String>,
-    pub api_secret: Option<String>,
-    pub api_passphrase: Option<String>,
     pub private_key: Option<String>,
     pub proxy_wallet_address: Option<String>,
     pub signature_type: Option<u8>,
@@ -100,9 +100,6 @@ impl Default for Config {
             polymarket: PolymarketConfig {
                 gamma_api_url: "https://gamma-api.polymarket.com".to_string(),
                 clob_api_url: "https://clob.polymarket.com".to_string(),
-                api_key: None,
-                api_secret: None,
-                api_passphrase: None,
                 private_key: None,
                 proxy_wallet_address: None,
                 signature_type: None,
@@ -112,13 +109,13 @@ impl Default for Config {
             },
             strategy: StrategyConfig {
                 symbols: default_symbols(),
-                sum_threshold: 0.99,
-                verify_fill_secs: 10,
                 simulation_mode: false,
-                pre_order_enabled: false,
-                pre_order_size: default_pre_order_size(),
-                pre_order_side: default_pre_order_side(),
-                pre_order_improve_ticks: 0,
+                sweep_enabled: false,
+                sweep_max_price: default_sweep_max_price(),
+                sweep_min_margin: default_sweep_min_margin(),
+                sweep_timeout_secs: default_sweep_timeout_secs(),
+                sweep_order_size: default_sweep_order_size(),
+                sweep_inter_order_delay_ms: default_sweep_inter_order_delay_ms(),
             },
         }
     }

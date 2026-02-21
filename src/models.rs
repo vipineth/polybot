@@ -48,16 +48,6 @@ pub struct OrderBookEntry {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OrderRequest {
-    pub token_id: String,
-    pub side: String,
-    pub size: String,
-    pub price: String,
-    #[serde(rename = "type")]
-    pub order_type: String,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderResponse {
     pub order_id: Option<String>,
     pub status: String,
@@ -65,17 +55,6 @@ pub struct OrderResponse {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct OrderStatus {
-    pub id: Option<String>,
-    pub status: Option<String>,
-    #[serde(rename = "original_size")]
-    pub original_size: Option<String>,
-    #[serde(rename = "size_matched")]
-    pub size_matched: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-
 pub struct RedeemResponse {
     pub success: bool,
     pub message: Option<String>,
@@ -83,21 +62,3 @@ pub struct RedeemResponse {
     pub amount_redeemed: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TokenPrice {
-    pub token_id: String,
-    pub bid: Option<Decimal>,
-    pub ask: Option<Decimal>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Fill {
-    #[serde(rename = "tokenID")]
-    pub token_id: Option<String>,
-    pub side: String,
-    pub size: f64,
-    pub price: f64,
-    pub timestamp: u64,
-    #[serde(rename = "conditionId")]
-    pub condition_id: Option<String>,
-}
