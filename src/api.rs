@@ -237,8 +237,16 @@ impl PolymarketApi {
         let response = match client.post_order(signed_order).await {
             Ok(resp) => resp,
             Err(e) => {
-                // FOK orders can fail if not fillable — treat as unfilled
-                warn!("FOK buy failed (likely unfillable): {}", e);
+                let err_str = e.to_string().to_lowercase();
+                if err_str.contains("timeout") || err_str.contains("timed out")
+                    || err_str.contains("connection") || err_str.contains("connect")
+                    || err_str.contains("broken pipe") || err_str.contains("reset")
+                {
+                    // Network error: order may have been placed — halt sweep
+                    return Err(anyhow::anyhow!("FOK buy network error (order may be placed): {}", e));
+                }
+                // API rejection: order was not placed — skip and continue
+                warn!("FOK buy rejected (unfillable): {}", e);
                 return Ok(None);
             }
         };
@@ -489,69 +497,90 @@ impl PolymarketApi {
             (ctf_address, redeem_calldata, 300_000, false)
         };
 
-        let provider = ProviderBuilder::new()
-            .wallet(signer.clone())
-            .connect(rpc_url)
-            .await
-            .context("Failed to connect to Polygon RPC")?;
-
-        let tx_request = TransactionRequest {
-            to: Some(alloy::primitives::TxKind::Call(tx_to)),
-            input: Bytes::from(tx_data).into(),
-            value: Some(U256::ZERO),
-            gas: Some(gas_limit),
-            ..Default::default()
+        // Try each RPC URL for sending the redemption transaction
+        let redeem_urls: Vec<&str> = if self.rpc_urls.is_empty() {
+            vec!["https://polygon-rpc.com"]
+        } else {
+            self.rpc_urls.iter().map(|s| s.as_str()).collect()
         };
 
-        let pending_tx = match provider.send_transaction(tx_request).await {
-            Ok(tx) => tx,
-            Err(e) => {
-                let err_msg = format!("Failed to send redeem transaction: {}", e);
-                eprintln!("   {}", err_msg);
-                anyhow::bail!("{}", err_msg);
+        let mut last_redeem_err = anyhow::anyhow!("no RPC URLs configured for redemption");
+
+        for redeem_rpc_url in &redeem_urls {
+            let provider = match ProviderBuilder::new()
+                .wallet(signer.clone())
+                .connect(*redeem_rpc_url)
+                .await
+            {
+                Ok(p) => p,
+                Err(e) => {
+                    warn!("Redemption: connect to {} failed: {}", redeem_rpc_url, e);
+                    last_redeem_err = anyhow::anyhow!("connect to {} failed: {}", redeem_rpc_url, e);
+                    continue;
+                }
+            };
+
+            let tx_request = TransactionRequest {
+                to: Some(alloy::primitives::TxKind::Call(tx_to)),
+                input: Bytes::from(tx_data.clone()).into(),
+                value: Some(U256::ZERO),
+                gas: Some(gas_limit),
+                ..Default::default()
+            };
+
+            let pending_tx = match provider.send_transaction(tx_request).await {
+                Ok(tx) => tx,
+                Err(e) => {
+                    warn!("Redemption: send via {} failed: {}", redeem_rpc_url, e);
+                    last_redeem_err = anyhow::anyhow!("send via {} failed: {}", redeem_rpc_url, e);
+                    continue;
+                }
+            };
+
+            // Transaction sent — do NOT retry from here (tx may be on chain)
+            let tx_hash = *pending_tx.tx_hash();
+            eprintln!("   Transaction sent via {}, waiting for confirmation...", redeem_rpc_url);
+            eprintln!("   Transaction hash: {:?}", tx_hash);
+
+            let receipt = pending_tx.get_receipt().await
+                .context("Failed to get transaction receipt")?;
+
+            if !receipt.status() {
+                anyhow::bail!("Redemption transaction failed. Transaction hash: {:?}", tx_hash);
             }
-        };
 
-        let tx_hash = *pending_tx.tx_hash();
-        eprintln!("   Transaction sent, waiting for confirmation...");
-        eprintln!("   Transaction hash: {:?}", tx_hash);
-
-        let receipt = pending_tx.get_receipt().await
-            .context("Failed to get transaction receipt")?;
-
-        if !receipt.status() {
-            anyhow::bail!("Redemption transaction failed. Transaction hash: {:?}", tx_hash);
-        }
-
-        if used_safe_redemption {
-            let payout_redemption_topic = keccak256(
-                b"PayoutRedemption(address,address,bytes32,bytes32,uint256[],uint256)"
-            );
-            let logs = receipt.logs();
-            let ctf_has_payout = logs.iter().any(|log| {
-                log.address() == ctf_address && log.topics().first().map(|t| t.as_slice()) == Some(payout_redemption_topic.as_slice())
-            });
-            if !ctf_has_payout {
-                anyhow::bail!(
-                    "Redemption tx was mined but the inner redeem reverted (no PayoutRedemption from CTF). \
-                    Check that the Safe holds the winning tokens and conditionId/indexSet are correct. Tx: {:?}",
-                    tx_hash
+            if used_safe_redemption {
+                let payout_redemption_topic = keccak256(
+                    b"PayoutRedemption(address,address,bytes32,bytes32,uint256[],uint256)"
                 );
+                let logs = receipt.logs();
+                let ctf_has_payout = logs.iter().any(|log| {
+                    log.address() == ctf_address && log.topics().first().map(|t| t.as_slice()) == Some(payout_redemption_topic.as_slice())
+                });
+                if !ctf_has_payout {
+                    anyhow::bail!(
+                        "Redemption tx was mined but the inner redeem reverted (no PayoutRedemption from CTF). \
+                        Check that the Safe holds the winning tokens and conditionId/indexSet are correct. Tx: {:?}",
+                        tx_hash
+                    );
+                }
             }
+
+            let redeem_response = RedeemResponse {
+                success: true,
+                message: Some(format!("Successfully redeemed tokens. Transaction: {:?}", tx_hash)),
+                transaction_hash: Some(format!("{:?}", tx_hash)),
+                amount_redeemed: None,
+            };
+            eprintln!("Successfully redeemed winning tokens!");
+            eprintln!("Transaction hash: {:?}", tx_hash);
+            if let Some(block_number) = receipt.block_number {
+                eprintln!("Block number: {}", block_number);
+            }
+            return Ok(redeem_response);
         }
 
-        let redeem_response = RedeemResponse {
-            success: true,
-            message: Some(format!("Successfully redeemed tokens. Transaction: {:?}", tx_hash)),
-            transaction_hash: Some(format!("{:?}", tx_hash)),
-            amount_redeemed: None,
-        };
-        eprintln!("Successfully redeemed winning tokens!");
-        eprintln!("Transaction hash: {:?}", tx_hash);
-        if let Some(block_number) = receipt.block_number {
-            eprintln!("Block number: {}", block_number);
-        }
-        Ok(redeem_response)
+        Err(last_redeem_err)
     }
 
     /// Fetch latest price from a Chainlink aggregator via eth_call (latestRoundData).

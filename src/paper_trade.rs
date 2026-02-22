@@ -119,25 +119,25 @@ impl PaperTradeLogger {
         }
 
         // Pick best available price (freshest)
-        let best = match (rtds_price, rpc_price) {
+        let (best, best_age_s) = match (rtds_price, rpc_price) {
             (Some(rp), Some(cp)) => {
                 if rtds_age_s <= rpc_age_s {
                     let _ = writeln!(md, "- **Best source**: RTDS WS");
-                    Some(rp)
+                    (Some(rp), rtds_age_s)
                 } else {
                     let _ = writeln!(md, "- **Best source**: Chainlink RPC");
-                    Some(cp)
+                    (Some(cp), rpc_age_s)
                 }
             }
             (Some(rp), None) => {
                 let _ = writeln!(md, "- **Best source**: RTDS");
-                Some(rp)
+                (Some(rp), rtds_age_s)
             }
             (None, Some(cp)) => {
                 let _ = writeln!(md, "- **Best source**: Chainlink RPC");
-                Some(cp)
+                (Some(cp), rpc_age_s)
             }
-            (None, None) => None,
+            (None, None) => (None, i64::MAX),
         };
 
         let latest_price = match best {
@@ -150,8 +150,42 @@ impl PaperTradeLogger {
             }
         };
 
+        // Staleness check (consistency with real strategy)
+        if best_age_s > cfg.sweep_timeout_secs as i64 {
+            let _ = writeln!(
+                md,
+                "- **STALE** — price is {}s old (max {}s), would skip in live mode\n",
+                best_age_s, cfg.sweep_timeout_secs
+            );
+            let _ = writeln!(md, "---\n");
+            self.append(&md).await;
+            return;
+        }
+
         // Determine winner
         let diff = latest_price - price_to_beat;
+
+        // Zero diff (tied prices)
+        if diff == 0.0 {
+            let _ = writeln!(md, "- **Winner**: NONE (tied) — diff=0, skipping\n");
+            let _ = writeln!(md, "---\n");
+            self.append(&md).await;
+            return;
+        }
+
+        // Minimum margin check (percentage of price_to_beat)
+        let min_margin_abs = cfg.sweep_min_margin_pct * price_to_beat;
+        if diff.abs() < min_margin_abs {
+            let _ = writeln!(
+                md,
+                "- **BELOW MARGIN** — diff ${} < min margin ${} ({}% of ${}), would skip in live mode\n",
+                diff.abs(), min_margin_abs, cfg.sweep_min_margin_pct * 100.0, price_to_beat
+            );
+            let _ = writeln!(md, "---\n");
+            self.append(&md).await;
+            return;
+        }
+
         let (winner, winning_token) = if diff > 0.0 {
             ("Up", m5_up)
         } else {
@@ -176,34 +210,57 @@ impl PaperTradeLogger {
                 let mut sweepable_levels = 0u32;
                 let mut sweepable_shares = 0.0f64;
                 let mut sweepable_cost = 0.0f64;
+                let mut capped_cost = 0.0f64;
+                let mut capped_shares = 0.0f64;
+                let mut capped_levels = 0u32;
 
-                for ask in &orderbook.asks {
+                // Sort asks descending (most expensive first) to match sweep order
+                let mut sorted_asks = orderbook.asks.clone();
+                sorted_asks.sort_by(|a, b| b.price.cmp(&a.price));
+
+                for ask in &sorted_asks {
                     let p: f64 = ask.price.to_string().parse().unwrap_or(1.0);
                     let s: f64 = ask.size.to_string().parse().unwrap_or(0.0);
                     let usd = p * s;
-                    let _ = writeln!(md, "| {}  | {}  | ${}   |", p, s, usd);
+                    let in_range = p >= cfg.sweep_min_price && p <= cfg.sweep_max_price;
+                    let marker = if in_range && capped_cost < cfg.max_sweep_cost { " *" } else { "" };
+                    let _ = writeln!(md, "| {}  | {}  | ${}  |{}", p, s, usd, marker);
 
-                    if p >= cfg.sweep_min_price && p <= cfg.sweep_max_price {
+                    if in_range {
                         sweepable_levels += 1;
                         sweepable_shares += s;
                         sweepable_cost += usd;
+                        // Track what we'd actually buy within max_sweep_cost budget
+                        if capped_cost < cfg.max_sweep_cost {
+                            let remaining_budget = cfg.max_sweep_cost - capped_cost;
+                            let buyable_usd = usd.min(remaining_budget);
+                            let buyable_shares = if p > 0.0 { buyable_usd / p } else { 0.0 };
+                            capped_cost += buyable_usd;
+                            capped_shares += buyable_shares;
+                            capped_levels += 1;
+                        }
                     }
                 }
 
                 let _ = writeln!(md);
                 let _ = writeln!(
                     md,
-                    "- **Sweepable asks** ([{}, {}]): {} levels, {} shares, ${} cost",
-                    cfg.sweep_min_price, cfg.sweep_max_price, sweepable_levels, sweepable_shares, sweepable_cost
+                    "- **Sweepable asks** (<= {}): {} levels, {} shares, ${} cost",
+                    cfg.sweep_max_price, sweepable_levels, sweepable_shares, sweepable_cost
                 );
 
-                if sweepable_shares > 0.0 {
-                    let avg_price = sweepable_cost / sweepable_shares;
-                    let profit = sweepable_shares * (1.0 - avg_price);
+                if capped_shares > 0.0 {
+                    let avg_price = capped_cost / capped_shares;
+                    let profit = capped_shares * (1.0 - avg_price);
                     let _ = writeln!(
                         md,
-                        "- **Hypothetical P&L**: buy {} @ avg {} -> profit ${} ({} * (1.0 - {}))\n",
-                        sweepable_shares, avg_price, profit, sweepable_shares, avg_price
+                        "- **Within budget** (${}): {} levels, {:.2} shares, ${:.2} cost, avg {:.4}",
+                        cfg.max_sweep_cost, capped_levels, capped_shares, capped_cost, avg_price
+                    );
+                    let _ = writeln!(
+                        md,
+                        "- **Hypothetical P&L**: buy {:.2} shares @ avg {:.4} -> profit ${:.2}\n",
+                        capped_shares, avg_price, profit
                     );
                 } else {
                     let _ = writeln!(md, "- **Hypothetical P&L**: no sweepable asks\n");

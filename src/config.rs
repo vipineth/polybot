@@ -32,10 +32,10 @@ pub struct StrategyConfig {
     /// Enable post-close sweep: buy winning tokens from stale limit orders after market closes.
     #[serde(default)]
     pub sweep_enabled: bool,
-    /// Max ask price to buy winning tokens (e.g. 0.995 = pay at most 99.5c for a $1 token).
+    /// Max ask price to buy winning tokens (e.g. 0.999 = pay at most 99.9c for a $1 token).
     #[serde(default = "default_sweep_max_price")]
     pub sweep_max_price: f64,
-    /// Min ask price to consider (e.g. 0.90 = ignore asks below 90c, those aren't stale orders).
+    /// Min ask price to consider (safety floor for parsing errors only, not a strategy filter).
     #[serde(default = "default_sweep_min_price")]
     pub sweep_min_price: f64,
     /// Seconds to sweep before giving up.
@@ -47,16 +47,23 @@ pub struct StrategyConfig {
     /// Milliseconds between FOK orders.
     #[serde(default = "default_sweep_inter_order_delay_ms")]
     pub sweep_inter_order_delay_ms: u64,
+    /// Minimum price margin as a percentage of price_to_beat.
+    /// E.g., 0.0001 = 0.01% → BTC@$68k requires ~$6.80 move to sweep.
+    #[serde(default = "default_sweep_min_margin_pct")]
+    pub sweep_min_margin_pct: f64,
+    /// Maximum total cost (USD) per sweep. Safety cap to limit exposure on wrong-winner.
+    #[serde(default = "default_max_sweep_cost")]
+    pub max_sweep_cost: f64,
 }
 
 fn default_symbols() -> Vec<String> {
     vec!["btc".into(), "eth".into(), "sol".into(), "xrp".into()]
 }
 fn default_sweep_max_price() -> f64 {
-    0.995
+    0.999
 }
 fn default_sweep_min_price() -> f64 {
-    0.90
+    0.01
 }
 fn default_sweep_timeout_secs() -> u64 {
     30
@@ -66,6 +73,12 @@ fn default_sweep_order_size() -> String {
 }
 fn default_sweep_inter_order_delay_ms() -> u64 {
     50
+}
+fn default_sweep_min_margin_pct() -> f64 {
+    0.0001
+}
+fn default_max_sweep_cost() -> f64 {
+    500.0
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -123,6 +136,8 @@ impl Default for Config {
                 sweep_timeout_secs: default_sweep_timeout_secs(),
                 sweep_order_size: default_sweep_order_size(),
                 sweep_inter_order_delay_ms: default_sweep_inter_order_delay_ms(),
+                sweep_min_margin_pct: default_sweep_min_margin_pct(),
+                max_sweep_cost: default_max_sweep_cost(),
             },
         }
     }

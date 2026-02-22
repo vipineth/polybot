@@ -184,6 +184,20 @@ impl ArbStrategy {
             symbol, source, latest_price, age_secs
         );
 
+        // Price sanity validation
+        if latest_price.is_nan() || latest_price.is_infinite() || latest_price <= 0.0
+            || latest_price < 0.001 || latest_price > 1_000_000.0
+        {
+            warn!("Sweep {}: latest_price {} fails sanity check, skipping.", symbol, latest_price);
+            return Ok((0, 0.0, 0.0));
+        }
+        if price_to_beat.is_nan() || price_to_beat.is_infinite() || price_to_beat <= 0.0
+            || price_to_beat < 0.001 || price_to_beat > 1_000_000.0
+        {
+            warn!("Sweep {}: price_to_beat {} fails sanity check, skipping.", symbol, price_to_beat);
+            return Ok((0, 0.0, 0.0));
+        }
+
         // Check staleness
         if age_secs > cfg.sweep_timeout_secs as i64 {
             warn!(
@@ -199,6 +213,34 @@ impl ArbStrategy {
             "Sweep {}: latest_price={}, price_to_beat={}, diff={}",
             symbol, latest_price, price_to_beat, diff
         );
+
+        // Guard: zero diff (tied prices)
+        if diff == 0.0 {
+            info!("Sweep {}: diff=0 (tied prices), skipping.", symbol);
+            return Ok((0, 0.0, 0.0));
+        }
+
+        // Cross-validate RTDS vs RPC prices when both available
+        if let (Some(rp), Some(cp)) = (rtds_price, rpc_price) {
+            let source_disagreement = (rp - cp).abs();
+            if source_disagreement > diff.abs() {
+                warn!(
+                    "Sweep {}: source disagreement (${}) > price movement (${}), skipping. RTDS=${}, RPC=${}",
+                    symbol, source_disagreement, diff.abs(), rp, cp
+                );
+                return Ok((0, 0.0, 0.0));
+            }
+        }
+
+        // Check minimum margin (percentage of price_to_beat)
+        let min_margin_abs = cfg.sweep_min_margin_pct * price_to_beat;
+        if diff.abs() < min_margin_abs {
+            info!(
+                "Sweep {}: diff ${} < min margin ${} ({}% of ${}), skipping.",
+                symbol, diff.abs(), min_margin_abs, cfg.sweep_min_margin_pct * 100.0, price_to_beat
+            );
+            return Ok((0, 0.0, 0.0));
+        }
 
         // Determine winner: diff > 0 -> Up, diff < 0 -> Down
         let (winner, winning_token) = if diff > 0.0 {
@@ -225,8 +267,15 @@ impl ArbStrategy {
         let mut total_orders: u32 = 0;
         let mut total_shares: f64 = 0.0;
         let mut total_cost: f64 = 0.0;
+        let mut consecutive_empty_passes: u32 = 0;
 
         while sweep_start.elapsed() < timeout {
+            // Max cost cap
+            if total_cost >= cfg.max_sweep_cost {
+                info!("Sweep {}: reached max_sweep_cost ${}, stopping.", symbol, cfg.max_sweep_cost);
+                break;
+            }
+
             // a. Fetch orderbook for winning token
             let orderbook = match self.api.get_orderbook(winning_token).await {
                 Ok(ob) => ob,
@@ -236,8 +285,10 @@ impl ArbStrategy {
                 }
             };
 
-            // b. Collect asks where price is in [sweep_min_price, sweep_max_price]
-            let eligible_asks: Vec<_> = orderbook
+            // b. Collect asks where price <= sweep_max_price, sorted most expensive first.
+            //    Target top-of-book (0.99) first — that's where real stale fills happen.
+            //    Cheap phantom asks (0.01-0.30) are tried last if budget remains.
+            let mut eligible_asks: Vec<_> = orderbook
                 .asks
                 .iter()
                 .filter(|a| {
@@ -245,16 +296,27 @@ impl ArbStrategy {
                     p >= cfg.sweep_min_price && p <= cfg.sweep_max_price
                 })
                 .collect();
+            eligible_asks.sort_by(|a, b| b.price.cmp(&a.price));
 
             if eligible_asks.is_empty() {
-                info!("Sweep {}: no eligible asks in [{}, {}], done.", symbol, cfg.sweep_min_price, cfg.sweep_max_price);
-                break;
+                consecutive_empty_passes += 1;
+                if consecutive_empty_passes >= 3 {
+                    info!("Sweep {}: {} consecutive empty passes, stopping.", symbol, consecutive_empty_passes);
+                    break;
+                }
+                info!("Sweep {}: no eligible asks, empty pass {}/3, retrying in 500ms...", symbol, consecutive_empty_passes);
+                sleep(Duration::from_millis(500)).await;
+                continue;
             }
 
             let mut filled_any = false;
-            // c. For each ask: place FOK buy at that price/size
+            // c. For each ask: place FOK buy at that price/size (cheapest first)
             for ask in &eligible_asks {
                 if sweep_start.elapsed() >= timeout {
+                    break;
+                }
+                if total_cost >= cfg.max_sweep_cost {
+                    info!("Sweep {}: reached max_sweep_cost ${} mid-pass, stopping.", symbol, cfg.max_sweep_cost);
                     break;
                 }
 
@@ -275,19 +337,22 @@ impl ArbStrategy {
                         total_cost += shares * price;
                         filled_any = true;
                         info!(
-                            "Sweep {}: FILLED order #{} (id={}) +{} shares @ {}",
+                            "Sweep {}: FILLED order #{} (id={}) +{} shares @ {} (total_cost=${})",
                             symbol,
                             total_orders,
                             resp.order_id.as_deref().unwrap_or("?"),
                             shares,
-                            price_str
+                            price_str,
+                            total_cost
                         );
                     }
                     Ok(None) => {
                         info!("Sweep {}: FOK not fillable @ {}, skipping.", symbol, price_str);
                     }
                     Err(e) => {
-                        warn!("Sweep {}: FOK order error: {}", symbol, e);
+                        // Network error — order may have been placed, halt sweep
+                        error!("Sweep {}: FOK network error, halting sweep: {}", symbol, e);
+                        break;
                     }
                 }
 
@@ -295,9 +360,16 @@ impl ArbStrategy {
                 sleep(Duration::from_millis(cfg.sweep_inter_order_delay_ms)).await;
             }
 
-            if !filled_any {
-                info!("Sweep {}: no fills this pass, stopping.", symbol);
-                break;
+            if filled_any {
+                consecutive_empty_passes = 0;
+            } else {
+                consecutive_empty_passes += 1;
+                if consecutive_empty_passes >= 3 {
+                    info!("Sweep {}: {} consecutive empty passes, stopping.", symbol, consecutive_empty_passes);
+                    break;
+                }
+                info!("Sweep {}: no fills this pass ({}/3), retrying in 500ms...", symbol, consecutive_empty_passes);
+                sleep(Duration::from_millis(500)).await;
             }
 
             // e. Re-fetch orderbook and repeat
