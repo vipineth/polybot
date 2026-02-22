@@ -1,6 +1,6 @@
 //! Polymarket RTDS (Real-Time Data Socket) — Chainlink crypto/USD prices (btc, eth, sol, xrp).
 //! Per docs: https://docs.polymarket.com/developers/RTDS/RTDS-crypto-prices
-//! Topic: crypto_prices_chainlink, filter per symbol (e.g. btc/usd, eth/usd).
+//! Topic: crypto_prices_chainlink, subscribe with type: "*" and filters: "" for all symbols.
 //! Price-to-beat: use the message whose feed_ts is at (or within 2s of) the period start.
 
 use crate::discovery::period_start_et_unix_for_timestamp;
@@ -65,11 +65,6 @@ pub type PriceCacheMulti = Arc<RwLock<HashMap<String, HashMap<i64, f64>>>>;
 /// Latest price per symbol: symbol -> (latest_price_usd, timestamp_ms).
 pub type LatestPriceCache = Arc<RwLock<HashMap<String, (f64, i64)>>>;
 
-/// RTDS symbol to feed symbol (e.g. btc -> btc/usd).
-fn rtds_feed_symbol(symbol: &str) -> String {
-    format!("{}/usd", symbol.to_lowercase())
-}
-
 /// Normalize payload symbol "btc/usd" -> "btc". Returns None if not a known format.
 fn payload_symbol_to_key(s: &str) -> Option<String> {
     let s = s.trim().to_lowercase();
@@ -80,43 +75,35 @@ fn payload_symbol_to_key(s: &str) -> Option<String> {
     }
 }
 
-/// Connect to Polymarket RTDS, subscribe to crypto_prices_chainlink for given symbols.
-/// When feed_ts is in [period_start, period_start+2), set price-to-beat for that (symbol, period).
-/// Also updates latest_prices on every incoming message for post-close sweep.
-pub async fn run_rtds_chainlink_multi(
+/// Connect to Polymarket RTDS and subscribe to crypto_prices_chainlink for all symbols.
+/// Per docs: type "*" with empty filters subscribes to all available symbols on one connection.
+pub async fn run_rtds_chainlink_all(
     ws_url: &str,
     symbols: &[String],
     price_cache_5: PriceCacheMulti,
     latest_prices: LatestPriceCache,
 ) -> Result<()> {
     let url = ws_url.trim_end_matches('/');
-    let symbol_set: std::collections::HashSet<String> = symbols.iter().map(|s| s.to_lowercase()).collect();
-    info!(
-        "RTDS WS connecting: {} (symbols: {:?})",
-        url, symbols
-    );
+    let symbol_set: std::collections::HashSet<String> =
+        symbols.iter().map(|s| s.to_lowercase()).collect();
+    info!("RTDS WS connecting: {} (symbols: {:?})", url, symbols);
 
     let (mut ws_stream, _) = connect_async(url).await.context("RTDS WS connect failed")?;
-    let subscriptions: Vec<serde_json::Value> = symbols
-        .iter()
-        .map(|s| {
-            let feed = rtds_feed_symbol(s);
-            serde_json::json!({
-                "topic": "crypto_prices_chainlink",
-                "type": "*",
-                "filters": format!("{{\"symbol\":\"{}\"}}", feed)
-            })
-        })
-        .collect();
+
+    // Per docs: subscribe to all chainlink symbols with type: "*" and filters: ""
     let sub = serde_json::json!({
         "action": "subscribe",
-        "subscriptions": subscriptions
+        "subscriptions": [{
+            "topic": "crypto_prices_chainlink",
+            "type": "*",
+            "filters": ""
+        }]
     });
     ws_stream
         .send(Message::Text(sub.to_string()))
         .await
         .context("RTDS WS subscribe failed")?;
-    info!("RTDS WS subscribed to {} symbols", symbols.len());
+    info!("RTDS WS subscribed to crypto_prices_chainlink (all symbols)");
 
     let mut ping = interval(Duration::from_secs(PING_INTERVAL_SECS));
     ping.tick().await;
@@ -145,7 +132,7 @@ pub async fn run_rtds_chainlink_multi(
                                         let per_symbol = cache.entry(key.clone()).or_default();
                                         if !per_symbol.contains_key(&period_5) {
                                             per_symbol.insert(period_5, p.value);
-                                            info!("RTDS WS price-to-beat 5m {}: period {} -> {:.2} USD (feed_ts={})", key, period_5, p.value, ts_sec);
+                                            info!("RTDS WS price-to-beat 5m {}: period {} -> {} USD (feed_ts={})", key, period_5, p.value, ts_sec);
                                         }
                                     }
                                 }

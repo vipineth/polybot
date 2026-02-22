@@ -30,6 +30,23 @@ pub fn build_5m_slug(symbol: &str, period_start_unix: i64) -> String {
     format!("{}-updown-5m-{}", symbol.to_lowercase(), period_start_unix)
 }
 
+/// Format a 5m period as "February 21, 6:35PM-6:40PM ET".
+pub fn format_5m_period_et(period_start_unix: i64) -> String {
+    let start = chrono::Utc.timestamp_opt(period_start_unix, 0).single()
+        .map(|dt| dt.with_timezone(&New_York));
+    let end = chrono::Utc.timestamp_opt(period_start_unix + 5 * 60, 0).single()
+        .map(|dt| dt.with_timezone(&New_York));
+    match (start, end) {
+        (Some(s), Some(e)) => format!(
+            "{}, {}:{}{}-{}:{}{} ET",
+            s.format("%B %-d"),
+            s.format("%-I"), s.format("%M"), s.format("%p").to_string().to_uppercase(),
+            e.format("%-I"), e.format("%M"), e.format("%p").to_string().to_uppercase(),
+        ),
+        _ => format!("period={}", period_start_unix),
+    }
+}
+
 /// Current 5-minute period start (Unix). Aligned to 5m boundaries in Eastern Time (Polymarket uses ET).
 pub fn current_5m_period_start() -> i64 {
     period_start_et_unix(5)

@@ -3,9 +3,9 @@
 
 use crate::api::PolymarketApi;
 use crate::config::StrategyConfig;
+use crate::discovery::format_5m_period_et;
 use crate::rtds::LatestPriceCache;
 use chrono::Utc;
-use chrono_tz::America::New_York;
 use log::error;
 use std::fmt::Write as FmtWrite;
 use std::io::Write as IoWrite;
@@ -42,8 +42,7 @@ impl PaperTradeLogger {
         m5_down: &str,
     ) {
         let now_ms = Utc::now().timestamp_millis();
-        let now_et = Utc::now().with_timezone(&New_York);
-        let time_str = now_et.format("%Y-%m-%d %H:%M ET").to_string();
+        let period_str = format_5m_period_et(period_5);
 
         // --- Source 1: RTDS WS (cached from Polymarket WebSocket) ---
         let rtds_start = std::time::Instant::now();
@@ -57,7 +56,7 @@ impl PaperTradeLogger {
             Some((p, ts)) => {
                 let age = (now_ms - ts) / 1000;
                 let line = format!(
-                    "- **RTDS WS**: ${:.2} (age={}s, {:.1}ms)",
+                    "- **RTDS WS**: ${} (age={}s, {:.1}ms)",
                     p,
                     age,
                     rtds_elapsed.as_secs_f64() * 1000.0
@@ -76,7 +75,7 @@ impl PaperTradeLogger {
             Ok((p, updated_at)) => {
                 let age = (now_ms / 1000) as i64 - (*updated_at as i64);
                 let line = format!(
-                    "- **Chainlink RPC**: ${:.2} (age={}s, {:.0}ms)",
+                    "- **Chainlink RPC**: ${} (age={}s, {:.0}ms)",
                     p,
                     age,
                     rpc_elapsed.as_secs_f64() * 1000.0
@@ -90,12 +89,11 @@ impl PaperTradeLogger {
         let mut md = String::new();
         let _ = writeln!(
             md,
-            "## {} | {} | period={}\n",
-            time_str,
+            "## {} | {}\n",
             symbol.to_uppercase(),
-            period_5
+            period_str
         );
-        let _ = writeln!(md, "- **Price-to-beat**: ${:.2}", price_to_beat);
+        let _ = writeln!(md, "- **Price-to-beat**: ${}", price_to_beat);
         let _ = writeln!(md, "{}", rtds_line);
         let _ = writeln!(md, "{}", rpc_line);
 
@@ -115,7 +113,7 @@ impl PaperTradeLogger {
             };
             let _ = writeln!(
                 md,
-                "- **Speed**: {} faster by {:.0}ms (RTDS WS {:.1}ms vs RPC {:.0}ms) | fresher: {} | price diff: ${:.2}",
+                "- **Speed**: {} faster by {:.0}ms (RTDS WS {:.1}ms vs RPC {:.0}ms) | fresher: {} | price diff: ${}",
                 faster, speed_diff, rtds_ms, rpc_ms, fresher, price_diff
             );
         }
@@ -160,14 +158,12 @@ impl PaperTradeLogger {
             ("Down", m5_down)
         };
 
-        let margin_ok = diff.abs() >= cfg.sweep_min_margin;
         let _ = writeln!(
             md,
-            "- **Winner**: {} (diff={}{:.2}, margin {})\n",
+            "- **Winner**: {} (diff={}{})\n",
             winner,
             if diff >= 0.0 { "+$" } else { "-$" },
             diff.abs(),
-            if margin_ok { "OK" } else { "BELOW MIN" }
         );
 
         // Fetch orderbook for winning token
@@ -185,9 +181,9 @@ impl PaperTradeLogger {
                     let p: f64 = ask.price.to_string().parse().unwrap_or(1.0);
                     let s: f64 = ask.size.to_string().parse().unwrap_or(0.0);
                     let usd = p * s;
-                    let _ = writeln!(md, "| {:.3}  | {:.0}  | ${:.2}   |", p, s, usd);
+                    let _ = writeln!(md, "| {}  | {}  | ${}   |", p, s, usd);
 
-                    if p <= cfg.sweep_max_price {
+                    if p >= cfg.sweep_min_price && p <= cfg.sweep_max_price {
                         sweepable_levels += 1;
                         sweepable_shares += s;
                         sweepable_cost += usd;
@@ -197,8 +193,8 @@ impl PaperTradeLogger {
                 let _ = writeln!(md);
                 let _ = writeln!(
                     md,
-                    "- **Sweepable asks** (<= {:.3}): {} levels, {:.0} shares, ${:.2} cost",
-                    cfg.sweep_max_price, sweepable_levels, sweepable_shares, sweepable_cost
+                    "- **Sweepable asks** ([{}, {}]): {} levels, {} shares, ${} cost",
+                    cfg.sweep_min_price, cfg.sweep_max_price, sweepable_levels, sweepable_shares, sweepable_cost
                 );
 
                 if sweepable_shares > 0.0 {
@@ -206,7 +202,7 @@ impl PaperTradeLogger {
                     let profit = sweepable_shares * (1.0 - avg_price);
                     let _ = writeln!(
                         md,
-                        "- **Hypothetical P&L**: buy {:.0} @ avg {:.3} -> profit ${:.2} ({:.0} * (1.0 - {:.3}))\n",
+                        "- **Hypothetical P&L**: buy {} @ avg {} -> profit ${} ({} * (1.0 - {}))\n",
                         sweepable_shares, avg_price, profit, sweepable_shares, avg_price
                     );
                 } else {

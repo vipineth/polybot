@@ -37,7 +37,7 @@ async fn main() -> Result<()> {
         config.polymarket.private_key.clone(),
         config.polymarket.proxy_wallet_address.clone(),
         config.polymarket.signature_type,
-        config.polymarket.rpc_url.clone(),
+        config.polymarket.rpc_urls.clone(),
     ));
 
     if args.redeem {

@@ -40,7 +40,7 @@ pub struct PolymarketApi {
     private_key: Option<String>,
     proxy_wallet_address: Option<String>,
     signature_type: Option<u8>,
-    rpc_url: Option<String>,
+    rpc_urls: Vec<String>,
 }
 
 impl PolymarketApi {
@@ -50,7 +50,7 @@ impl PolymarketApi {
         private_key: Option<String>,
         proxy_wallet_address: Option<String>,
         signature_type: Option<u8>,
-        rpc_url: Option<String>,
+        rpc_urls: Vec<String>,
     ) -> Self {
         let client = Client::builder()
             .timeout(std::time::Duration::from_secs(10))
@@ -63,7 +63,7 @@ impl PolymarketApi {
             private_key,
             proxy_wallet_address,
             signature_type,
-            rpc_url,
+            rpc_urls,
         }
     }
 
@@ -327,7 +327,7 @@ impl PolymarketApi {
               condition_id, outcome, index_set);
 
         const CTF_CONTRACT: &str = "0x4d97dcd97ec945f40cf65f87097ace5ea0476045";
-        let rpc_url = self.rpc_url.as_deref().unwrap_or("https://polygon-rpc.com");
+        let rpc_url = self.rpc_urls.first().map(|s| s.as_str()).unwrap_or("https://polygon-rpc.com");
         const PROXY_WALLET_FACTORY: &str = "0xaB45c5A4B0c941a2F231C04C3f49182e1A254052";
 
         let ctf_address = parse_address_hex(CTF_CONTRACT)
@@ -555,6 +555,7 @@ impl PolymarketApi {
     }
 
     /// Fetch latest price from a Chainlink aggregator via eth_call (latestRoundData).
+    /// Tries each configured RPC URL in order until one succeeds.
     /// Returns (price_usd, updated_at_unix_secs).
     pub async fn get_chainlink_price_rpc(
         &self,
@@ -562,7 +563,12 @@ impl PolymarketApi {
     ) -> Result<(f64, u64)> {
         let aggregator = chainlink_aggregator_address(symbol)
             .ok_or_else(|| anyhow::anyhow!("No Chainlink aggregator for symbol: {}", symbol))?;
-        let rpc_url = self.rpc_url.as_deref().unwrap_or("https://polygon-rpc.com");
+
+        let urls: Vec<&str> = if self.rpc_urls.is_empty() {
+            vec!["https://polygon-rpc.com"]
+        } else {
+            self.rpc_urls.iter().map(|s| s.as_str()).collect()
+        };
 
         let selector = keccak256(b"latestRoundData()");
         let data = format!("0x{}", hex::encode(&selector.as_slice()[..4]));
@@ -573,35 +579,54 @@ impl PolymarketApi {
             "id": 1
         });
 
+        let mut last_err = anyhow::anyhow!("no RPC URLs configured");
+
+        for rpc_url in &urls {
+            match self.try_chainlink_rpc(rpc_url, &body, symbol).await {
+                Ok(result) => return Ok(result),
+                Err(e) => {
+                    warn!("Chainlink RPC {} failed on {}: {}", symbol, rpc_url, e);
+                    last_err = e;
+                }
+            }
+        }
+
+        Err(last_err)
+    }
+
+    async fn try_chainlink_rpc(
+        &self,
+        rpc_url: &str,
+        body: &Value,
+        symbol: &str,
+    ) -> Result<(f64, u64)> {
         let response = self.client
             .post(rpc_url)
-            .json(&body)
+            .json(body)
             .send()
             .await
-            .context("Chainlink RPC request failed")?;
+            .context(format!("Chainlink RPC request to {} failed", rpc_url))?;
 
         let status = response.status();
         let text = response.text().await.context("Read Chainlink RPC body")?;
         let json: Value = serde_json::from_str(&text)
-            .context(format!("Parse Chainlink RPC response (status={})", status))?;
+            .context(format!("Parse Chainlink RPC response (status={}) from {}", status, rpc_url))?;
 
         if let Some(err) = json.get("error") {
-            anyhow::bail!("Chainlink RPC error: {} (status={})", err, status);
+            anyhow::bail!("Chainlink RPC error: {} (status={}) from {}", err, status, rpc_url);
         }
 
         let hex_result = json
             .get("result")
             .and_then(|v| v.as_str())
-            .ok_or_else(|| anyhow::anyhow!("No 'result' in Chainlink RPC response"))?;
+            .ok_or_else(|| anyhow::anyhow!("No 'result' in Chainlink RPC response from {}", rpc_url))?;
         let hex_result = hex_result.strip_prefix("0x").unwrap_or(hex_result);
 
         if hex_result.len() < 64 * 5 {
-            anyhow::bail!("Chainlink result too short: {} hex chars (need 320)", hex_result.len());
+            anyhow::bail!("Chainlink result too short: {} hex chars (need 320) from {}", hex_result.len(), rpc_url);
         }
 
         let raw = hex::decode(hex_result).context("Hex decode Chainlink result")?;
-        // latestRoundData returns: (roundId, answer, startedAt, updatedAt, answeredInRound)
-        // Each is int256/uint256 = 32 bytes
         let answer_slice = raw.get(32..64)
             .ok_or_else(|| anyhow::anyhow!("Answer slice out of bounds (raw len={})", raw.len()))?;
         let answer = i128::from_be_bytes(
@@ -615,7 +640,7 @@ impl PolymarketApi {
             updated_slice[24..32].try_into().context("updatedAt bytes")?
         );
 
-        info!("Chainlink RPC {}: ${:.2} (updatedAt={})", symbol, price, updated_at);
+        info!("Chainlink RPC {}: ${} (updatedAt={}) via {}", symbol, price, updated_at, rpc_url);
         Ok((price, updated_at))
     }
 }

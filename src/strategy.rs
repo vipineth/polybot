@@ -46,8 +46,8 @@ impl ArbStrategy {
     async fn wait_for_5m_market_and_price(&self, symbol: &str) -> Result<(String, String, String, i64, f64)> {
         loop {
             let period_5 = current_5m_period_start();
-            let (m5_cid, question_price) = match self.discovery.get_5m_market(symbol, period_5).await? {
-                Some((cid, qp)) => (cid, qp),
+            let m5_cid = match self.discovery.get_5m_market(symbol, period_5).await? {
+                Some((cid, _)) => cid,
                 None => {
                     warn!("{} no market for period {}, skipping", symbol, period_5);
                     let remaining = (period_5 + MARKET_5M_DURATION_SECS) - Utc::now().timestamp();
@@ -80,7 +80,7 @@ impl ArbStrategy {
                 }
             };
             let (m5_up, m5_down) = self.discovery.get_market_tokens(&m5_cid).await?;
-            info!("{} period={} price-to-beat=${:.2} ({})", symbol, period_5, price_to_beat, source);
+            info!("{} period={} price-to-beat=${} ({})", symbol, period_5, price_to_beat, source);
             return Ok((m5_cid, m5_up, m5_down, period_5, price_to_beat));
         }
     }
@@ -125,7 +125,7 @@ impl ArbStrategy {
             Some((p, ts)) => {
                 let age = (now_ms - ts) / 1000;
                 info!(
-                    "Sweep {} RTDS WS: ${:.2} (age={}s, {:.1}ms)",
+                    "Sweep {} RTDS WS: ${} (age={}s, {:.1}ms)",
                     symbol, p, age, rtds_elapsed.as_secs_f64() * 1000.0
                 );
                 (Some(p), age)
@@ -148,7 +148,7 @@ impl ArbStrategy {
             Ok((p, updated_at)) => {
                 let age = (now_ms / 1000) as i64 - (*updated_at as i64);
                 info!(
-                    "Sweep {} Chainlink RPC: ${:.2} (age={}s, {:.0}ms)",
+                    "Sweep {} Chainlink RPC: ${} (age={}s, {:.0}ms)",
                     symbol, p, age, rpc_elapsed.as_secs_f64() * 1000.0
                 );
                 (Some(*p), age)
@@ -180,7 +180,7 @@ impl ArbStrategy {
         };
 
         info!(
-            "Sweep {} using {} price: ${:.2} (age={}s)",
+            "Sweep {} using {} price: ${} (age={}s)",
             symbol, source, latest_price, age_secs
         );
 
@@ -196,29 +196,18 @@ impl ArbStrategy {
         // Compute diff = latest_price - price_to_beat
         let diff = latest_price - price_to_beat;
         info!(
-            "Sweep {}: latest_price={:.2}, price_to_beat={:.2}, diff={:.2}",
+            "Sweep {}: latest_price={}, price_to_beat={}, diff={}",
             symbol, latest_price, price_to_beat, diff
         );
 
-        // Check min_margin
-        if diff.abs() < cfg.sweep_min_margin {
-            info!(
-                "Sweep {}: |diff| {:.2} < min_margin {:.2}, skipping.",
-                symbol,
-                diff.abs(),
-                cfg.sweep_min_margin
-            );
-            return Ok((0, 0.0, 0.0));
-        }
-
-        // 5. Determine winner: diff > 0 -> Up, diff < 0 -> Down
+        // Determine winner: diff > 0 -> Up, diff < 0 -> Down
         let (winner, winning_token) = if diff > 0.0 {
             ("Up", m5_up)
         } else {
             ("Down", m5_down)
         };
         info!(
-            "Sweep {}: winner={} (diff={:.2}), sweeping token {}",
+            "Sweep {}: winner={} (diff={}), sweeping token {}",
             symbol,
             winner,
             diff,
@@ -247,18 +236,18 @@ impl ArbStrategy {
                 }
             };
 
-            // b. Collect asks where price <= sweep_max_price
+            // b. Collect asks where price is in [sweep_min_price, sweep_max_price]
             let eligible_asks: Vec<_> = orderbook
                 .asks
                 .iter()
                 .filter(|a| {
                     let p = a.price.to_string().parse::<f64>().unwrap_or(1.0);
-                    p <= cfg.sweep_max_price
+                    p >= cfg.sweep_min_price && p <= cfg.sweep_max_price
                 })
                 .collect();
 
             if eligible_asks.is_empty() {
-                info!("Sweep {}: no eligible asks <= {:.3}, done.", symbol, cfg.sweep_max_price);
+                info!("Sweep {}: no eligible asks in [{}, {}], done.", symbol, cfg.sweep_min_price, cfg.sweep_max_price);
                 break;
             }
 
@@ -315,7 +304,7 @@ impl ArbStrategy {
         }
 
         info!(
-            "Sweep {} complete: {} orders, {:.1} shares, ${:.2} cost",
+            "Sweep {} complete: {} orders, {} shares, ${} cost",
             symbol, total_orders, total_shares, total_cost
         );
         Ok((total_orders, total_shares, total_cost))

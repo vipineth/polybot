@@ -35,9 +35,9 @@ pub struct StrategyConfig {
     /// Max ask price to buy winning tokens (e.g. 0.995 = pay at most 99.5c for a $1 token).
     #[serde(default = "default_sweep_max_price")]
     pub sweep_max_price: f64,
-    /// Min USD difference between latest price and price-to-beat to trigger sweep.
-    #[serde(default = "default_sweep_min_margin")]
-    pub sweep_min_margin: f64,
+    /// Min ask price to consider (e.g. 0.90 = ignore asks below 90c, those aren't stale orders).
+    #[serde(default = "default_sweep_min_price")]
+    pub sweep_min_price: f64,
     /// Seconds to sweep before giving up.
     #[serde(default = "default_sweep_timeout_secs")]
     pub sweep_timeout_secs: u64,
@@ -55,8 +55,8 @@ fn default_symbols() -> Vec<String> {
 fn default_sweep_max_price() -> f64 {
     0.995
 }
-fn default_sweep_min_margin() -> f64 {
-    5.0
+fn default_sweep_min_price() -> f64 {
+    0.90
 }
 fn default_sweep_timeout_secs() -> u64 {
     30
@@ -75,15 +75,22 @@ pub struct PolymarketConfig {
     pub private_key: Option<String>,
     pub proxy_wallet_address: Option<String>,
     pub signature_type: Option<u8>,
-    /// Polygon RPC URL for redemption (Safe reads + sendTransaction). Defaults to polygon-rpc.com if unset.
-    #[serde(default)]
-    pub rpc_url: Option<String>,
+    /// Polygon RPC URLs (tried in order as fallbacks for Chainlink price reads and redemption).
+    #[serde(default = "default_rpc_urls")]
+    pub rpc_urls: Vec<String>,
     /// WebSocket base URL for market channel (e.g. wss://ws-subscriptions-clob.polymarket.com).
     #[serde(default = "default_ws_url")]
     pub ws_url: String,
     /// RTDS WebSocket URL for Chainlink BTC price (price-to-beat). Topic: crypto_prices_chainlink, symbol: btc/usd.
     #[serde(default = "default_rtds_ws_url")]
     pub rtds_ws_url: String,
+}
+
+fn default_rpc_urls() -> Vec<String> {
+    vec![
+        "https://1rpc.io/matic".to_string(),
+        "https://poly.api.pocket.network".to_string(),
+    ]
 }
 
 fn default_ws_url() -> String {
@@ -103,7 +110,7 @@ impl Default for Config {
                 private_key: None,
                 proxy_wallet_address: None,
                 signature_type: None,
-                rpc_url: None,
+                rpc_urls: default_rpc_urls(),
                 ws_url: default_ws_url(),
                 rtds_ws_url: default_rtds_ws_url(),
             },
@@ -112,7 +119,7 @@ impl Default for Config {
                 simulation_mode: false,
                 sweep_enabled: false,
                 sweep_max_price: default_sweep_max_price(),
-                sweep_min_margin: default_sweep_min_margin(),
+                sweep_min_price: default_sweep_min_price(),
                 sweep_timeout_secs: default_sweep_timeout_secs(),
                 sweep_order_size: default_sweep_order_size(),
                 sweep_inter_order_delay_ms: default_sweep_inter_order_delay_ms(),
