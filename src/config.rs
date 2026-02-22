@@ -61,7 +61,7 @@ fn default_sweep_inter_order_delay_ms() -> u64 {
     50
 }
 fn default_sweep_min_margin_pct() -> f64 {
-    0.0001
+    0.00001
 }
 fn default_max_sweep_cost() -> f64 {
     500.0

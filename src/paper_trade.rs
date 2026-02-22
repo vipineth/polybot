@@ -91,13 +91,6 @@ impl PaperTradeLogger {
 
         let diff = latest_price - price_to_beat;
 
-        if diff == 0.0 {
-            let _ = writeln!(md, "- **Winner**: NONE (tied) — diff=0\n---\n");
-            self.log_entry(symbol, &md).await;
-            self.log_buffer.push(symbol, "info", format!("{} | tied", period_str)).await;
-            return;
-        }
-
         let min_margin_abs = cfg.sweep_min_margin_pct * price_to_beat;
         if diff.abs() < min_margin_abs {
             let _ = writeln!(
