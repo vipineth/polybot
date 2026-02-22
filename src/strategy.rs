@@ -5,6 +5,7 @@ use crate::api::PolymarketApi;
 use crate::chainlink::run_chainlink_multi_poller;
 use crate::config::Config;
 use crate::discovery::{current_5m_period_start, MarketDiscovery, MARKET_5M_DURATION_SECS};
+use crate::log_buffer::LogBuffer;
 use crate::paper_trade::PaperTradeLogger;
 use crate::rtds::{LatestPriceCache, PriceCacheMulti};
 use anyhow::Result;
@@ -25,12 +26,14 @@ pub struct ArbStrategy {
     latest_prices: LatestPriceCache,
     /// Paper trade logger (shared across symbol loops).
     paper_trader: PaperTradeLogger,
+    /// Web dashboard log buffer.
+    log_buffer: LogBuffer,
 }
 
 impl ArbStrategy {
-    pub fn new(api: Arc<PolymarketApi>, config: Config) -> Self {
+    pub fn new(api: Arc<PolymarketApi>, config: Config, log_buffer: LogBuffer) -> Self {
         let latest_prices: LatestPriceCache = Arc::new(RwLock::new(HashMap::new()));
-        let paper_trader = PaperTradeLogger::new(api.clone(), Arc::clone(&latest_prices));
+        let paper_trader = PaperTradeLogger::new(api.clone(), Arc::clone(&latest_prices), log_buffer.clone());
         Self {
             discovery: MarketDiscovery::new(api.clone()),
             api,
@@ -38,6 +41,7 @@ impl ArbStrategy {
             price_cache_5: Arc::new(RwLock::new(HashMap::new())),
             latest_prices,
             paper_trader,
+            log_buffer,
         }
     }
 
@@ -81,6 +85,7 @@ impl ArbStrategy {
             };
             let (m5_up, m5_down) = self.discovery.get_market_tokens(&m5_cid).await?;
             info!("{} period={} price-to-beat=${} ({})", symbol, period_5, price_to_beat, source);
+            self.log_buffer.push(symbol, "info", format!("period={} price-to-beat=${} ({})", period_5, price_to_beat, source)).await;
             return Ok((m5_cid, m5_up, m5_down, period_5, price_to_beat));
         }
     }
@@ -97,6 +102,7 @@ impl ArbStrategy {
             sleep(Duration::from_secs(remaining as u64)).await;
         }
         info!("{} period {} closed", symbol, period_5);
+        self.log_buffer.push(symbol, "info", format!("period {} closed", period_5)).await;
         Ok(())
     }
 
@@ -255,6 +261,7 @@ impl ArbStrategy {
             diff,
             &winning_token[..winning_token.len().min(20)]
         );
+        self.log_buffer.push(symbol, "info", format!("sweep winner={} (price=${}, ptb=${}, diff={})", winner, latest_price, price_to_beat, diff)).await;
 
         if self.config.strategy.simulation_mode {
             info!("Sweep {}: SIMULATION MODE - would sweep {} token, skipping actual orders.", symbol, winner);
@@ -379,6 +386,7 @@ impl ArbStrategy {
             "Sweep {} complete: {} orders, {} shares, ${} cost",
             symbol, total_orders, total_shares, total_cost
         );
+        self.log_buffer.push(symbol, "info", format!("sweep complete: {} orders, {} shares, ${} cost", total_orders, total_shares, total_cost)).await;
         Ok((total_orders, total_shares, total_cost))
     }
 
@@ -429,6 +437,7 @@ impl ArbStrategy {
         price_cache_5: PriceCacheMulti,
         latest_prices: LatestPriceCache,
         paper_trader: PaperTradeLogger,
+        log_buffer: LogBuffer,
         symbol: String,
     ) -> Result<()> {
         let discovery = MarketDiscovery::new(api.clone());
@@ -439,6 +448,7 @@ impl ArbStrategy {
             price_cache_5,
             latest_prices,
             paper_trader,
+            log_buffer,
         };
         loop {
             let (m5_cid, m5_up, m5_down, period_5, price_to_beat) =
@@ -495,8 +505,9 @@ impl ArbStrategy {
             let price_cache_5 = Arc::clone(&self.price_cache_5);
             let latest_prices = Arc::clone(&self.latest_prices);
             let paper_trader = self.paper_trader.clone();
+            let log_buffer = self.log_buffer.clone();
             handles.push(tokio::spawn(async move {
-                if let Err(e) = Self::run_symbol_loop(api, config, price_cache_5, latest_prices, paper_trader, symbol.clone()).await {
+                if let Err(e) = Self::run_symbol_loop(api, config, price_cache_5, latest_prices, paper_trader, log_buffer, symbol.clone()).await {
                     error!("Symbol loop {} failed: {}", symbol, e);
                 }
             }));

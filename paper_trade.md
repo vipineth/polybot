@@ -2820,3 +2820,1996 @@
 
 ---
 
+## SOL | February 21, 11:25PM-11:30PM ET
+
+- **Price-to-beat**: $84.9795489345833
+- **RTDS WS**: $85.00547878639198 (age=1s, 0.0ms)
+- **Chainlink RPC**: $85.00212516 (age=26s, 640ms)
+- **Speed**: RTDS WS faster by 640ms (RTDS WS 0.0ms vs RPC 640ms) | fresher: RTDS WS | price diff: $0.0033536263919700104
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.02592985180866947)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 21, 11:25PM-11:30PM ET
+
+- **Price-to-beat**: $1971.703052677763
+- **RTDS WS**: $1971.7891832321543 (age=1s, 0.0ms)
+- **Chainlink RPC**: $1971.704286 (age=30s, 483ms)
+- **Speed**: RTDS WS faster by 483ms (RTDS WS 0.0ms vs RPC 483ms) | fresher: RTDS WS | price diff: $0.08489723215438971
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.08613055439127493)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 1632.5  | $1616.175   |
+| 0.98  | 120  | $117.6   |
+| 0.97  | 321.66  | $312.0102   |
+| 0.96  | 15060  | $14457.6   |
+| 0.95  | 70  | $66.5   |
+| 0.94  | 15033.32  | $14131.3208   |
+| 0.93  | 134.5  | $125.08500000000001   |
+| 0.89  | 8000  | $7120   |
+| 0.86  | 8000  | $6880   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 3000  | $869.9999999999999   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.1  | 10598  | $1059.8   |
+| 0.09  | 11510  | $1035.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11510  | $345.3   |
+| 0.02  | 21530  | $430.6   |
+| 0.01  | 427933.37  | $4279.3337   |
+
+- **Sweepable asks** ([0.9, 0.995]): 7 levels, 32371.98 shares, $30826.290999999997 cost
+- **Hypothetical P&L**: buy 32371.98 @ avg 0.9522522564266999 -> profit $1545.6890000000005 (32371.98 * (1.0 - 0.9522522564266999))
+
+---
+
+## BTC | February 21, 11:25PM-11:30PM ET
+
+- **Price-to-beat**: $67999.19959823182
+- **RTDS WS**: $67998.96375768553 (age=1s, 0.0ms)
+- **Chainlink RPC**: $67997.718661 (age=12s, 687ms)
+- **Speed**: RTDS WS faster by 686ms (RTDS WS 0.0ms vs RPC 687ms) | fresher: RTDS WS | price diff: $1.2450966855249135
+- **Best source**: RTDS WS
+- **Winner**: Down (diff=-$0.2358405462873634)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 21, 11:25PM-11:30PM ET
+
+- **Price-to-beat**: $1.42391035
+- **RTDS WS**: $1.423975991142999 (age=1s, 0.0ms)
+- **Chainlink RPC**: $1.423924 (age=20s, 2940ms)
+- **Speed**: RTDS WS faster by 2940ms (RTDS WS 0.0ms vs RPC 2940ms) | fresher: RTDS WS | price diff: $0.000051991142999030515
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.00006564114299889567)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 21, 11:30PM-11:35PM ET
+
+- **Price-to-beat**: $67992.51536721569
+- **RTDS WS**: $67990.4341566268 (age=1s, 0.0ms)
+- **Chainlink RPC**: $67996.015687 (age=2s, 759ms)
+- **Speed**: RTDS WS faster by 759ms (RTDS WS 0.0ms vs RPC 759ms) | fresher: RTDS WS | price diff: $5.581530373208807
+- **Best source**: RTDS WS
+- **Winner**: Down (diff=-$2.0812105888908263)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 21, 11:30PM-11:35PM ET
+
+- **Price-to-beat**: $1971.6961408994648
+- **RTDS WS**: $1972.174126647087 (age=3s, 0.0ms)
+- **Chainlink RPC**: $1972.31442927 (age=30s, 1224ms)
+- **Speed**: RTDS WS faster by 1224ms (RTDS WS 0.0ms vs RPC 1224ms) | fresher: RTDS WS | price diff: $0.14030262291294093
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.4779857476221423)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## SOL | February 21, 11:30PM-11:35PM ET
+
+- **Price-to-beat**: $84.99700934895927
+- **RTDS WS**: $85.081145 (age=3s, 0.0ms)
+- **Chainlink RPC**: $85.08 (age=18s, 2133ms)
+- **Speed**: RTDS WS faster by 2133ms (RTDS WS 0.0ms vs RPC 2133ms) | fresher: RTDS WS | price diff: $0.0011450000000081673
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.08413565104073939)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 21, 11:30PM-11:35PM ET
+
+- **Price-to-beat**: $1.423916245743436
+- **RTDS WS**: $1.42425635 (age=1s, 0.0ms)
+- **Chainlink RPC**: $1.42474485 (age=20s, 1679ms)
+- **Speed**: RTDS WS faster by 1679ms (RTDS WS 0.0ms vs RPC 1679ms) | fresher: RTDS WS | price diff: $0.0004884999999998918
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.0003401042565640555)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 21, 11:35PM-11:40PM ET
+
+- **Price-to-beat**: $1.4242319160173469
+- **RTDS WS**: $1.4242625 (age=2s, 0.0ms)
+- **Chainlink RPC**: $1.424461 (age=12s, 849ms)
+- **Speed**: RTDS WS faster by 849ms (RTDS WS 0.0ms vs RPC 849ms) | fresher: RTDS WS | price diff: $0.00019849999999999035
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.000030583982653098474)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 981.43  | $971.6157   |
+| 0.98  | 33.97  | $33.2906   |
+| 0.96  | 15000  | $14400   |
+| 0.94  | 15000  | $14100   |
+| 0.9  | 55  | $49.5   |
+| 0.89  | 8000  | $7120   |
+| 0.86  | 8000  | $6880   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4000  | $1160   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.1  | 10598  | $1059.8   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11510  | $345.3   |
+| 0.02  | 18657  | $373.14   |
+| 0.01  | 443680.4  | $4436.804   |
+
+- **Sweepable asks** ([0.9, 0.995]): 5 levels, 31070.4 shares, $29554.406300000002 cost
+- **Hypothetical P&L**: buy 31070.4 @ avg 0.9512077829702869 -> profit $1515.9936999999995 (31070.4 * (1.0 - 0.9512077829702869))
+
+---
+
+## SOL | February 21, 11:35PM-11:40PM ET
+
+- **Price-to-beat**: $85.078013
+- **RTDS WS**: $85.13510468704332 (age=2s, 0.0ms)
+- **Chainlink RPC**: $85.13626 (age=10s, 1275ms)
+- **Speed**: RTDS WS faster by 1275ms (RTDS WS 0.0ms vs RPC 1275ms) | fresher: RTDS WS | price diff: $0.0011553129566692633
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.05709168704332512)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 21, 11:35PM-11:40PM ET
+
+- **Price-to-beat**: $1972.1308300324197
+- **RTDS WS**: $1972.9534255 (age=2s, 0.0ms)
+- **Chainlink RPC**: $1972.9396 (age=0s, 1434ms)
+- **Speed**: RTDS WS faster by 1434ms (RTDS WS 0.0ms vs RPC 1434ms) | fresher: Chainlink RPC | price diff: $0.013825500000166357
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.8087699675802469)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 21, 11:35PM-11:40PM ET
+
+- **Price-to-beat**: $67987.19198225052
+- **RTDS WS**: $67999.81886045182 (age=2s, 0.0ms)
+- **Chainlink RPC**: $68001.44801308 (age=6s, 1723ms)
+- **Speed**: RTDS WS faster by 1723ms (RTDS WS 0.0ms vs RPC 1723ms) | fresher: RTDS WS | price diff: $1.6291526281711413
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$12.626878201306681)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 21, 11:40PM-11:45PM ET
+
+- **Price-to-beat**: $1.4240815790592325
+- **RTDS WS**: $1.42276695 (age=1s, 0.0ms)
+- **Chainlink RPC**: $1.42277316 (age=16s, 314ms)
+- **Speed**: RTDS WS faster by 314ms (RTDS WS 0.0ms vs RPC 314ms) | fresher: RTDS WS | price diff: $0.000006210000000006488
+- **Best source**: RTDS WS
+- **Winner**: Down (diff=-$0.0013146290592325194)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## SOL | February 21, 11:40PM-11:45PM ET
+
+- **Price-to-beat**: $85.1275111135168
+- **RTDS WS**: $85.094475 (age=1s, 0.0ms)
+- **Chainlink RPC**: $85.09473 (age=6s, 505ms)
+- **Speed**: RTDS WS faster by 505ms (RTDS WS 0.0ms vs RPC 505ms) | fresher: RTDS WS | price diff: $0.00025499999999567535
+- **Best source**: RTDS WS
+- **Winner**: Down (diff=-$0.03303611351680047)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 21, 11:40PM-11:45PM ET
+
+- **Price-to-beat**: $1972.8104419932783
+- **RTDS WS**: $1971.313756 (age=1s, 0.0ms)
+- **Chainlink RPC**: $1971.27033438 (age=18s, 596ms)
+- **Speed**: RTDS WS faster by 596ms (RTDS WS 0.0ms vs RPC 596ms) | fresher: RTDS WS | price diff: $0.0434216200001174
+- **Best source**: RTDS WS
+- **Winner**: Down (diff=-$1.4966859932783336)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 12:10AM-12:15AM ET
+
+- **Price-to-beat**: $1.4187663
+- **RTDS WS**: $1.4216189 (age=499s, 0.0ms)
+- **Chainlink RPC**: $1.41846847 (age=26s, 448ms)
+- **Speed**: RTDS WS faster by 448ms (RTDS WS 0.0ms vs RPC 448ms) | fresher: Chainlink RPC | price diff: $0.0031504299999998153
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.0002978299999998324)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 12:10AM-12:15AM ET
+
+- **Price-to-beat**: $1971.3775
+- **RTDS WS**: $1973.6280405 (age=499s, 0.0ms)
+- **Chainlink RPC**: $1970.95581924 (age=24s, 816ms)
+- **Speed**: RTDS WS faster by 816ms (RTDS WS 0.0ms vs RPC 816ms) | fresher: Chainlink RPC | price diff: $2.672221260000015
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.42168076000007204)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## SOL | February 22, 12:10AM-12:15AM ET
+
+- **Price-to-beat**: $84.92
+- **RTDS WS**: $85.0694745 (age=499s, 0.0ms)
+- **Chainlink RPC**: $124.5054615 (age=5301909s, 2714ms)
+- **Speed**: RTDS WS faster by 2714ms (RTDS WS 0.0ms vs RPC 2714ms) | fresher: RTDS WS | price diff: $39.435987
+- **Best source**: RTDS WS
+- **Winner**: Up (diff=+$0.14947449999999662)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 21, 11:45PM-11:50PM ET
+
+- **Price-to-beat**: $67972.56904
+- **RTDS WS**: $67982.02593401316 (age=527s, 0.0ms)
+- **Chainlink RPC**: $67869.2004077 (age=40s, 149ms)
+- **Speed**: RTDS WS faster by 149ms (RTDS WS 0.0ms vs RPC 149ms) | fresher: Chainlink RPC | price diff: $112.82552631315775
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$103.36863230000017)
+
+### Winning token orderbook (Down)
+
+- **Orderbook fetch failed**: Failed to parse orderbook
+
+---
+
+## BTC | February 22, 12:15AM-12:20AM ET
+
+- **Price-to-beat**: $67893.24015
+- **RTDS WS**: $67982.02593401316 (age=799s, 0.0ms)
+- **Chainlink RPC**: $67904.331167 (age=2s, 558ms)
+- **Speed**: RTDS WS faster by 558ms (RTDS WS 0.0ms vs RPC 558ms) | fresher: Chainlink RPC | price diff: $77.69476701316307
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$11.091016999998828)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 8504.42  | $8419.3758   |
+| 0.98  | 2895.07  | $2837.1686   |
+| 0.97  | 1787.78  | $1734.1466   |
+| 0.96  | 16215  | $15566.4   |
+| 0.95  | 21670  | $20586.5   |
+| 0.94  | 16081  | $15116.14   |
+| 0.93  | 683  | $635.19   |
+| 0.92  | 225.5  | $207.46   |
+| 0.91  | 297  | $270.27   |
+| 0.9  | 1901  | $1710.9   |
+| 0.89  | 8228  | $7322.92   |
+| 0.88  | 10053.33  | $8846.9304   |
+| 0.87  | 149  | $129.63   |
+| 0.86  | 8000  | $6880   |
+| 0.85  | 52  | $44.199999999999996   |
+| 0.8  | 15.84  | $12.672   |
+| 0.75  | 43  | $32.25   |
+| 0.74  | 20  | $14.8   |
+| 0.73  | 40  | $29.2   |
+| 0.72  | 13.41  | $9.655199999999999   |
+| 0.7  | 49.15  | $34.404999999999994   |
+| 0.61  | 100  | $61   |
+| 0.6  | 5520.13  | $3312.078   |
+| 0.59  | 4.31  | $2.5428999999999995   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.53  | 6.18  | $3.2754   |
+| 0.51  | 68.36  | $34.8636   |
+| 0.49  | 8000  | $3920   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 5000  | $1450   |
+| 0.27  | 5000  | $1350   |
+| 0.25  | 6000  | $1500   |
+| 0.2  | 5510  | $1102   |
+| 0.1  | 10636  | $1063.6000000000001   |
+| 0.09  | 14510  | $1305.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 20510  | $1435.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8515  | $425.75   |
+| 0.04  | 17520  | $700.8000000000001   |
+| 0.03  | 11520  | $345.59999999999997   |
+| 0.02  | 31157  | $623.14   |
+| 0.01  | 544104.45  | $5441.0445   |
+
+- **Sweepable asks** ([0.9, 0.995]): 10 levels, 70259.77 shares, $67083.55099999999 cost
+- **Hypothetical P&L**: buy 70259.77 @ avg 0.9547932052723769 -> profit $3176.2190000000132 (70259.77 * (1.0 - 0.9547932052723769))
+
+---
+
+## ETH | February 22, 12:35AM-12:40AM ET
+
+- **Price-to-beat**: $1972.78133924
+- **RTDS WS**: $1973.6280405 (age=2924s, 0.0ms)
+- **Chainlink RPC**: unavailable
+- **Best source**: RTDS
+- **Winner**: Up (diff=+$0.846701259999918)
+
+### Winning token orderbook (Up)
+
+- **Orderbook fetch failed**: Failed to fetch orderbook
+
+---
+
+## XRP | February 22, 12:35AM-12:40AM ET
+
+- **Price-to-beat**: $1.4202064
+- **RTDS WS**: $1.4216189 (age=2924s, 0.0ms)
+- **Chainlink RPC**: unavailable
+- **Best source**: RTDS
+- **Winner**: Up (diff=+$0.0014124999999998167)
+
+### Winning token orderbook (Up)
+
+- **Orderbook fetch failed**: Failed to fetch orderbook
+
+---
+
+## SOL | February 22, 12:35AM-12:40AM ET
+
+- **Price-to-beat**: $84.93457437
+- **RTDS WS**: $85.0694745 (age=2924s, 0.0ms)
+- **Chainlink RPC**: unavailable
+- **Best source**: RTDS
+- **Winner**: Up (diff=+$0.13490012999999124)
+
+### Winning token orderbook (Up)
+
+- **Orderbook fetch failed**: Failed to fetch orderbook
+
+---
+
+## XRP | February 22, 1:00AM-1:05AM ET
+
+- **Price-to-beat**: $1.42143227
+- **RTDS WS**: $1.4216189 (age=3499s, 0.0ms)
+- **Chainlink RPC**: $1.423084 (age=2s, 804ms)
+- **Speed**: RTDS WS faster by 804ms (RTDS WS 0.0ms vs RPC 804ms) | fresher: Chainlink RPC | price diff: $0.001465100000000108
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.0016517300000000734)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 22, 1:00AM-1:05AM ET
+
+- **Price-to-beat**: $67993.06973806
+- **RTDS WS**: $67982.02593401316 (age=3537s, 0.0ms)
+- **Chainlink RPC**: $68012.33236 (age=16s, 610ms)
+- **Speed**: RTDS WS faster by 610ms (RTDS WS 0.0ms vs RPC 610ms) | fresher: Chainlink RPC | price diff: $30.306425986840622
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$19.26262193999719)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 1:05AM-1:10AM ET
+
+- **Price-to-beat**: $1975.73775448
+- **RTDS WS**: $1973.6280405 (age=3799s, 0.0ms)
+- **Chainlink RPC**: $1975.591975 (age=0s, 664ms)
+- **Speed**: RTDS WS faster by 664ms (RTDS WS 0.0ms vs RPC 664ms) | fresher: Chainlink RPC | price diff: $1.9639345000000503
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.14577947999987373)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:10AM-1:15AM ET
+
+- **Price-to-beat**: $1.41893861
+- **RTDS WS**: $1.4216189 (age=4099s, 0.0ms)
+- **Chainlink RPC**: $1.41955044 (age=18s, 650ms)
+- **Speed**: RTDS WS faster by 650ms (RTDS WS 0.0ms vs RPC 650ms) | fresher: Chainlink RPC | price diff: $0.0020684599999998277
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.0006118299999999799)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 1993.5  | $1973.565   |
+| 0.98  | 80  | $78.4   |
+| 0.97  | 730  | $708.1   |
+| 0.96  | 15010  | $14409.6   |
+| 0.95  | 25  | $23.75   |
+| 0.94  | 15000  | $14100   |
+| 0.92  | 25  | $23   |
+| 0.91  | 22.22  | $20.2202   |
+| 0.9  | 50  | $45   |
+| 0.89  | 8018.18  | $7136.180200000001   |
+| 0.88  | 8.33  | $7.3304   |
+| 0.87  | 10  | $8.7   |
+| 0.86  | 8000  | $6880   |
+| 0.75  | 5  | $3.75   |
+| 0.74  | 5  | $3.7   |
+| 0.6  | 5547  | $3328.2   |
+| 0.59  | 21  | $12.389999999999999   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.52  | 5.29  | $2.7508   |
+| 0.51  | 50.4  | $25.704   |
+| 0.5  | 21  | $10.5   |
+| 0.49  | 25  | $12.25   |
+| 0.45  | 10  | $4.5   |
+| 0.4  | 5  | $2   |
+| 0.386  | 14  | $5.404   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4000  | $1160   |
+| 0.27  | 5000  | $1350   |
+| 0.25  | 13.33  | $3.3325   |
+| 0.2  | 5510  | $1102   |
+| 0.12  | 47.46  | $5.6952   |
+| 0.1  | 10636  | $1063.6000000000001   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8520.04  | $596.4028000000001   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8515  | $425.75   |
+| 0.04  | 17586.07  | $703.4428   |
+| 0.03  | 11535.93  | $346.0779   |
+| 0.02  | 18636.94  | $372.73879999999997   |
+| 0.011  | 12.64  | $0.13904   |
+| 0.01  | 411197.7  | $4111.977   |
+| 0.001  | 169823.52  | $169.82352   |
+
+- **Sweepable asks** ([0.9, 0.995]): 9 levels, 32935.72 shares, $31381.6352 cost
+- **Hypothetical P&L**: buy 32935.72 @ avg 0.9528146097914362 -> profit $1554.0847999999999 (32935.72 * (1.0 - 0.9528146097914362))
+
+---
+
+## BTC | February 22, 1:10AM-1:15AM ET
+
+- **Price-to-beat**: $68012.553017
+- **RTDS WS**: $67982.02593401316 (age=4099s, 0.0ms)
+- **Chainlink RPC**: $68014.62106279 (age=16s, 1366ms)
+- **Speed**: RTDS WS faster by 1366ms (RTDS WS 0.0ms vs RPC 1366ms) | fresher: Chainlink RPC | price diff: $32.59512877684028
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$2.0680457900016336)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 22, 1:15AM-1:20AM ET
+
+- **Price-to-beat**: $68027.214625
+- **RTDS WS**: $67982.02593401316 (age=4399s, 0.0ms)
+- **Chainlink RPC**: $68027.67 (age=18s, 210ms)
+- **Speed**: RTDS WS faster by 210ms (RTDS WS 0.0ms vs RPC 210ms) | fresher: Chainlink RPC | price diff: $45.64406598683854
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.45537500000500586)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:15AM-1:20AM ET
+
+- **Price-to-beat**: $1.41970495
+- **RTDS WS**: $1.4216189 (age=4399s, 0.0ms)
+- **Chainlink RPC**: $1.41970495 (age=30s, 261ms)
+- **Speed**: RTDS WS faster by 261ms (RTDS WS 0.0ms vs RPC 261ms) | fresher: Chainlink RPC | price diff: $0.001913949999999831
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 803.05  | $795.0195   |
+| 0.98  | 80  | $78.4   |
+| 0.97  | 235  | $227.95   |
+| 0.96  | 15010  | $14409.6   |
+| 0.95  | 25  | $23.75   |
+| 0.92  | 25  | $23   |
+| 0.91  | 11.11  | $10.1101   |
+| 0.9  | 15  | $13.5   |
+| 0.89  | 8009.09  | $7128.0901   |
+| 0.88  | 8.33  | $7.3304   |
+| 0.87  | 10  | $8.7   |
+| 0.8  | 5  | $4   |
+| 0.77  | 5.27  | $4.0579   |
+| 0.75  | 2.52  | $1.8900000000000001   |
+| 0.64  | 46.58  | $29.8112   |
+| 0.6  | 5510  | $3306   |
+| 0.57  | 1000  | $570   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4000  | $1160   |
+| 0.2  | 5510  | $1102   |
+| 0.17  | 5  | $0.8500000000000001   |
+| 0.1  | 9092  | $909.2   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 8510  | $680.8000000000001   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 8510  | $340.40000000000003   |
+| 0.03  | 8510  | $255.29999999999998   |
+| 0.02  | 18537.64  | $370.7528   |
+| 0.01  | 352747.8  | $3527.478   |
+
+- **Sweepable asks** ([0.9, 0.995]): 8 levels, 16204.16 shares, $15581.329600000001 cost
+- **Hypothetical P&L**: buy 16204.16 @ avg 0.9615635491133142 -> profit $622.8303999999985 (16204.16 * (1.0 - 0.9615635491133142))
+
+---
+
+## ETH | February 22, 1:15AM-1:20AM ET
+
+- **Price-to-beat**: $1974.4492
+- **RTDS WS**: $1973.6280405 (age=4399s, 0.0ms)
+- **Chainlink RPC**: $1975.3944 (age=26s, 847ms)
+- **Speed**: RTDS WS faster by 847ms (RTDS WS 0.0ms vs RPC 847ms) | fresher: Chainlink RPC | price diff: $1.7663594999999077
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.9451999999998861)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:20AM-1:25AM ET
+
+- **Price-to-beat**: $1.41839999
+- **RTDS WS**: $1.4216189 (age=4699s, 0.0ms)
+- **Chainlink RPC**: $1.41857913 (age=0s, 722ms)
+- **Speed**: RTDS WS faster by 722ms (RTDS WS 0.0ms vs RPC 722ms) | fresher: Chainlink RPC | price diff: $0.003039769999999997
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.00017913999999996655)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 1493.5  | $1478.565   |
+| 0.98  | 80  | $78.4   |
+| 0.97  | 530  | $514.1   |
+| 0.96  | 15010  | $14409.6   |
+| 0.95  | 25  | $23.75   |
+| 0.94  | 15000  | $14100   |
+| 0.9  | 35  | $31.5   |
+| 0.89  | 8000  | $7120   |
+| 0.87  | 10  | $8.7   |
+| 0.86  | 8000  | $6880   |
+| 0.75  | 5  | $3.75   |
+| 0.7  | 10  | $7   |
+| 0.6  | 5520  | $3312   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.49  | 15  | $7.35   |
+| 0.4  | 5  | $2   |
+| 0.36  | 9  | $3.2399999999999998   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4000  | $1160   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.1  | 10636  | $1063.6000000000001   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20541.81  | $1643.3448   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 17520  | $700.8000000000001   |
+| 0.03  | 11510  | $345.3   |
+| 0.02  | 18596.36  | $371.9272   |
+| 0.01  | 476970.82  | $4769.7082   |
+
+- **Sweepable asks** ([0.9, 0.995]): 7 levels, 32173.5 shares, $30635.915 cost
+- **Hypothetical P&L**: buy 32173.5 @ avg 0.9522095824203148 -> profit $1537.5850000000005 (32173.5 * (1.0 - 0.9522095824203148))
+
+---
+
+## BTC | February 22, 1:20AM-1:25AM ET
+
+- **Price-to-beat**: $68016.08951291
+- **RTDS WS**: $67982.02593401316 (age=4699s, 0.0ms)
+- **Chainlink RPC**: $68019.666098 (age=10s, 352ms)
+- **Speed**: RTDS WS faster by 352ms (RTDS WS 0.0ms vs RPC 352ms) | fresher: Chainlink RPC | price diff: $37.6401639868418
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$3.5765850900061196)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 8176.03  | $8094.2697   |
+| 0.98  | 2215  | $2170.7   |
+| 0.97  | 1548.32  | $1501.8703999999998   |
+| 0.96  | 16019.56  | $15378.7776   |
+| 0.95  | 21465  | $20391.75   |
+| 0.94  | 15131  | $14223.14   |
+| 0.93  | 158  | $146.94   |
+| 0.92  | 80.5  | $74.06   |
+| 0.91  | 130  | $118.3   |
+| 0.9  | 269.88  | $242.892   |
+| 0.89  | 8203.05  | $7300.714499999999   |
+| 0.88  | 10033.33  | $8829.3304   |
+| 0.87  | 122  | $106.14   |
+| 0.86  | 8000  | $6880   |
+| 0.85  | 38  | $32.3   |
+| 0.83  | 199.93  | $165.9419   |
+| 0.82  | 27.62  | $22.6484   |
+| 0.8  | 99.5  | $79.60000000000001   |
+| 0.75  | 15  | $11.25   |
+| 0.72  | 10  | $7.199999999999999   |
+| 0.7  | 80.21  | $56.14699999999999   |
+| 0.67  | 39  | $26.130000000000003   |
+| 0.65  | 27.23  | $17.6995   |
+| 0.63  | 7  | $4.41   |
+| 0.62  | 75  | $46.5   |
+| 0.61  | 41  | $25.009999999999998   |
+| 0.6  | 5591.79  | $3355.074   |
+| 0.59  | 35  | $20.65   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.56  | 12  | $6.720000000000001   |
+| 0.55  | 22  | $12.100000000000001   |
+| 0.54  | 7  | $3.7800000000000002   |
+| 0.52  | 25  | $13   |
+| 0.51  | 282.58  | $144.1158   |
+| 0.5  | 96  | $48   |
+| 0.49  | 8020  | $3929.7999999999997   |
+| 0.48  | 20  | $9.6   |
+| 0.45  | 30  | $13.5   |
+| 0.44  | 42.63  | $18.7572   |
+| 0.4  | 354.46  | $141.784   |
+| 0.39  | 10  | $3.9000000000000004   |
+| 0.38  | 5  | $1.9   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 5000  | $1450   |
+| 0.27  | 5000  | $1350   |
+| 0.26  | 10  | $2.6   |
+| 0.25  | 6061.53  | $1515.3825   |
+| 0.24  | 12  | $2.88   |
+| 0.23  | 13  | $2.99   |
+| 0.22  | 21.37  | $4.7014000000000005   |
+| 0.21  | 22  | $4.62   |
+| 0.2  | 5510  | $1102   |
+| 0.19  | 5  | $0.95   |
+| 0.15  | 5  | $0.75   |
+| 0.11  | 23.58  | $2.5938   |
+| 0.1  | 10741  | $1074.1000000000001   |
+| 0.09  | 14510  | $1305.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 20640  | $1444.8000000000002   |
+| 0.06  | 8610  | $516.6   |
+| 0.05  | 8515  | $425.75   |
+| 0.04  | 17568.81  | $702.7524000000001   |
+| 0.03  | 11614.84  | $348.4452   |
+| 0.02  | 35581.75  | $711.635   |
+| 0.01  | 666248.54  | $6662.4854000000005   |
+
+- **Sweepable asks** ([0.9, 0.995]): 10 levels, 65193.28999999999 shares, $62342.699700000005 cost
+- **Hypothetical P&L**: buy 65193.28999999999 @ avg 0.9562747899362037 -> profit $2850.590299999988 (65193.28999999999 * (1.0 - 0.9562747899362037))
+
+---
+
+## XRP | February 22, 1:25AM-1:30AM ET
+
+- **Price-to-beat**: $1.4207906
+- **RTDS WS**: $1.4216189 (age=4999s, 0.0ms)
+- **Chainlink RPC**: $1.42077 (age=2s, 2388ms)
+- **Speed**: RTDS WS faster by 2388ms (RTDS WS 0.0ms vs RPC 2388ms) | fresher: Chainlink RPC | price diff: $0.0008488999999998192
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.00002059999999981521)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 2002.5  | $1982.475   |
+| 0.98  | 80  | $78.4   |
+| 0.97  | 730  | $708.1   |
+| 0.96  | 15010  | $14409.6   |
+| 0.95  | 25  | $23.75   |
+| 0.94  | 15000  | $14100   |
+| 0.9  | 30  | $27   |
+| 0.89  | 8000  | $7120   |
+| 0.87  | 10  | $8.7   |
+| 0.86  | 8000  | $6880   |
+| 0.75  | 5  | $3.75   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.5  | 35.63  | $17.815   |
+| 0.49  | 15  | $7.35   |
+| 0.47  | 10  | $4.699999999999999   |
+| 0.4  | 5  | $2   |
+| 0.3  | 5534.95  | $1660.485   |
+| 0.29  | 4007.83  | $1162.2706999999998   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.18  | 5  | $0.8999999999999999   |
+| 0.1  | 10636  | $1063.6000000000001   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 17515  | $700.6   |
+| 0.03  | 11683.62  | $350.5086   |
+| 0.021  | 5  | $0.10500000000000001   |
+| 0.02  | 18581.32  | $371.6264   |
+| 0.015  | 5.07  | $0.07605   |
+| 0.01  | 354401.09  | $3544.0109   |
+| 0.001  | 206526.52  | $206.52652   |
+
+- **Sweepable asks** ([0.9, 0.995]): 7 levels, 32877.5 shares, $31329.325 cost
+- **Hypothetical P&L**: buy 32877.5 @ avg 0.9529108052619573 -> profit $1548.1750000000002 (32877.5 * (1.0 - 0.9529108052619573))
+
+---
+
+## BTC | February 22, 1:25AM-1:30AM ET
+
+- **Price-to-beat**: $68101.58952314
+- **RTDS WS**: $67982.02593401316 (age=4999s, 0.0ms)
+- **Chainlink RPC**: $68093.87677916 (age=0s, 2906ms)
+- **Speed**: RTDS WS faster by 2906ms (RTDS WS 0.0ms vs RPC 2906ms) | fresher: Chainlink RPC | price diff: $111.85084514683695
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$7.712743980009691)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.999  | 5  | $4.995   |
+| 0.99  | 9862.77  | $9764.1423   |
+| 0.98  | 3396.2  | $3328.276   |
+| 0.97  | 1403  | $1360.9099999999999   |
+| 0.96  | 15809.81  | $15177.417599999999   |
+| 0.954  | 5  | $4.77   |
+| 0.95  | 20888  | $19843.6   |
+| 0.94  | 15061  | $14157.339999999998   |
+| 0.93  | 73  | $67.89   |
+| 0.92  | 38  | $34.96   |
+| 0.91  | 76  | $69.16   |
+| 0.9  | 271.52  | $244.368   |
+| 0.89  | 8058  | $7171.62   |
+| 0.88  | 10025  | $8822   |
+| 0.87  | 122  | $106.14   |
+| 0.86  | 8000  | $6880   |
+| 0.85  | 15  | $12.75   |
+| 0.83  | 20.06  | $16.6498   |
+| 0.79  | 5  | $3.95   |
+| 0.75  | 25  | $18.75   |
+| 0.7  | 320.11  | $224.077   |
+| 0.69  | 5  | $3.4499999999999997   |
+| 0.68  | 15  | $10.200000000000001   |
+| 0.66  | 7.7  | $5.082000000000001   |
+| 0.65  | 45  | $29.25   |
+| 0.64  | 83.55  | $53.472   |
+| 0.63  | 14.17  | $8.9271   |
+| 0.6  | 5565  | $3339   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1019.66  | $581.2062   |
+| 0.53  | 21.08  | $11.1724   |
+| 0.52  | 10  | $5.2   |
+| 0.51  | 115.81  | $59.063100000000006   |
+| 0.5  | 30  | $15   |
+| 0.49  | 8010  | $3924.9   |
+| 0.48  | 19.06  | $9.1488   |
+| 0.46  | 15  | $6.9   |
+| 0.45  | 50.87  | $22.8915   |
+| 0.41  | 10  | $4.1   |
+| 0.4  | 24  | $9.600000000000001   |
+| 0.39  | 5  | $1.9500000000000002   |
+| 0.38  | 10  | $3.8   |
+| 0.37  | 10  | $3.7   |
+| 0.36  | 5  | $1.7999999999999998   |
+| 0.35  | 10  | $3.5   |
+| 0.34  | 13.2  | $4.488   |
+| 0.33  | 16  | $5.28   |
+| 0.32  | 10.22  | $3.2704000000000004   |
+| 0.31  | 7  | $2.17   |
+| 0.3  | 5527  | $1658.1   |
+| 0.29  | 5008  | $1452.32   |
+| 0.28  | 10.6  | $2.968   |
+| 0.27  | 5036.8  | $1359.9360000000001   |
+| 0.26  | 33.81  | $8.790600000000001   |
+| 0.25  | 6039.8  | $1509.95   |
+| 0.24  | 19.8  | $4.752   |
+| 0.23  | 512.93  | $117.9739   |
+| 0.22  | 264.8  | $58.256   |
+| 0.21  | 22  | $4.62   |
+| 0.2  | 5547.27  | $1109.4540000000002   |
+| 0.19  | 10.8  | $2.052   |
+| 0.18  | 10  | $1.7999999999999998   |
+| 0.17  | 5  | $0.8500000000000001   |
+| 0.16  | 5  | $0.8   |
+| 0.15  | 66.28  | $9.942   |
+| 0.14  | 31  | $4.340000000000001   |
+| 0.13  | 170  | $22.1   |
+| 0.12  | 10  | $1.2   |
+| 0.1  | 10830.7  | $1083.0700000000002   |
+| 0.09  | 14520.98  | $1306.8881999999999   |
+| 0.08  | 20515.43  | $1641.2344   |
+| 0.07  | 20648.83  | $1445.4181000000003   |
+| 0.06  | 8521  | $511.26   |
+| 0.05  | 8875.79  | $443.7895000000001   |
+| 0.04  | 18122  | $724.88   |
+| 0.03  | 11618.3  | $348.549   |
+| 0.02  | 37564.71  | $751.2942   |
+| 0.015  | 5.07  | $0.07605   |
+| 0.014  | 16  | $0.224   |
+| 0.01  | 390539.55  | $3905.3955   |
+| 0.009  | 666  | $5.994   |
+| 0.005  | 51.12  | $0.2556   |
+| 0.004  | 2411.1  | $9.6444   |
+| 0.001  | 413228.76  | $413.22876   |
+
+- **Sweepable asks** ([0.9, 0.995]): 11 levels, 66884.3 shares, $64052.8339 cost
+- **Hypothetical P&L**: buy 66884.3 @ avg 0.9576662071667043 -> profit $2831.466100000003 (66884.3 * (1.0 - 0.9576662071667043))
+
+---
+
+## ETH | February 22, 1:25AM-1:30AM ET
+
+- **Price-to-beat**: $1974.435888
+- **RTDS WS**: $1973.6280405 (age=4999s, 0.0ms)
+- **Chainlink RPC**: $1976.6693 (age=26s, 4299ms)
+- **Speed**: RTDS WS faster by 4299ms (RTDS WS 0.0ms vs RPC 4299ms) | fresher: Chainlink RPC | price diff: $3.0412595000000238
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$2.233412000000044)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:30AM-1:35AM ET
+
+- **Price-to-beat**: $1.42392239
+- **RTDS WS**: $1.4216189 (age=5301s, 0.0ms)
+- **Chainlink RPC**: $1.42392239 (age=6s, 320ms)
+- **Speed**: RTDS WS faster by 320ms (RTDS WS 0.0ms vs RPC 320ms) | fresher: Chainlink RPC | price diff: $0.0023034900000000746
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 5607.32  | $5551.2468   |
+| 0.98  | 80  | $78.4   |
+| 0.97  | 430  | $417.09999999999997   |
+| 0.96  | 15310  | $14697.6   |
+| 0.95  | 25  | $23.75   |
+| 0.94  | 15000  | $14100   |
+| 0.9  | 30  | $27   |
+| 0.89  | 8000  | $7120   |
+| 0.87  | 10  | $8.7   |
+| 0.86  | 8000  | $6880   |
+| 0.82  | 5.89  | $4.8298   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.5  | 41.63  | $20.815   |
+| 0.49  | 15  | $7.35   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4000  | $1160   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.11  | 22.47  | $2.4717   |
+| 0.1  | 10636  | $1063.6000000000001   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8540.82  | $597.8574   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8625.83  | $431.29150000000004   |
+| 0.04  | 17528.77  | $701.1508   |
+| 0.03  | 11525.29  | $345.75870000000003   |
+| 0.02  | 18596.63  | $371.93260000000004   |
+| 0.01  | 487941.33  | $4879.4133   |
+
+- **Sweepable asks** ([0.9, 0.995]): 7 levels, 36482.32 shares, $34895.0968 cost
+- **Hypothetical P&L**: buy 36482.32 @ avg 0.9564933589749774 -> profit $1587.2232000000008 (36482.32 * (1.0 - 0.9564933589749774))
+
+---
+
+## ETH | February 22, 1:35AM-1:40AM ET
+
+- **Price-to-beat**: $1976.9157
+- **RTDS WS**: $1973.6280405 (age=5599s, 0.0ms)
+- **Chainlink RPC**: $1976.12755959 (age=22s, 312ms)
+- **Speed**: RTDS WS faster by 312ms (RTDS WS 0.0ms vs RPC 312ms) | fresher: Chainlink RPC | price diff: $2.4995190899999216
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.7881404100000964)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 22, 1:35AM-1:40AM ET
+
+- **Price-to-beat**: $68100.503
+- **RTDS WS**: $67982.02593401316 (age=5599s, 0.0ms)
+- **Chainlink RPC**: $68043.03814543 (age=28s, 506ms)
+- **Speed**: RTDS WS faster by 506ms (RTDS WS 0.0ms vs RPC 506ms) | fresher: Chainlink RPC | price diff: $61.01221141683345
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$57.46485457000381)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:35AM-1:40AM ET
+
+- **Price-to-beat**: $1.42282004
+- **RTDS WS**: $1.4216189 (age=5599s, 0.0ms)
+- **Chainlink RPC**: $1.42282004 (age=28s, 604ms)
+- **Speed**: RTDS WS faster by 604ms (RTDS WS 0.0ms vs RPC 604ms) | fresher: Chainlink RPC | price diff: $0.001201140000000045
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 22, 1:40AM-1:45AM ET
+
+- **Price-to-beat**: $68052.50486078
+- **RTDS WS**: $67982.02593401316 (age=5899s, 0.0ms)
+- **Chainlink RPC**: $68046.9403865 (age=20s, 483ms)
+- **Speed**: RTDS WS faster by 483ms (RTDS WS 0.0ms vs RPC 483ms) | fresher: Chainlink RPC | price diff: $64.91445248684613
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$5.564474279992282)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 7774.93  | $7697.1807   |
+| 0.98  | 2611.42  | $2559.1916   |
+| 0.97  | 1748.32  | $1695.8703999999998   |
+| 0.96  | 1245.54  | $1195.7184   |
+| 0.95  | 1100  | $1045   |
+| 0.94  | 15306  | $14387.64   |
+| 0.93  | 239  | $222.27   |
+| 0.92  | 133  | $122.36   |
+| 0.91  | 167  | $151.97   |
+| 0.9  | 298.58  | $268.722   |
+| 0.89  | 88  | $78.32000000000001   |
+| 0.88  | 41.66  | $36.660799999999995   |
+| 0.87  | 122  | $106.14   |
+| 0.86  | 8107.14  | $6972.1404   |
+| 0.85  | 32  | $27.2   |
+| 0.75  | 5  | $3.75   |
+| 0.7  | 40.22  | $28.153999999999996   |
+| 0.69  | 5  | $3.4499999999999997   |
+| 0.65  | 7.37  | $4.790500000000001   |
+| 0.62  | 5  | $3.1   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.5  | 5  | $2.5   |
+| 0.45  | 5  | $2.25   |
+| 0.4  | 5  | $2   |
+| 0.35  | 7  | $2.4499999999999997   |
+| 0.32  | 8.06  | $2.5792   |
+| 0.3  | 5516.5  | $1654.95   |
+| 0.27  | 5000  | $1350   |
+| 0.25  | 13.18  | $3.295   |
+| 0.24  | 12  | $2.88   |
+| 0.23  | 17.45  | $4.0135   |
+| 0.2  | 5518.5  | $1103.7   |
+| 0.15  | 8  | $1.2   |
+| 0.1  | 10643.6  | $1064.3600000000001   |
+| 0.09  | 8510  | $765.9   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8518.1  | $425.90500000000003   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11520  | $345.59999999999997   |
+| 0.02  | 14060.2  | $281.204   |
+| 0.01  | 461848.28  | $4618.482800000001   |
+
+- **Sweepable asks** ([0.9, 0.995]): 10 levels, 30623.79 shares, $29345.923100000004 cost
+- **Hypothetical P&L**: buy 30623.79 @ avg 0.9582720851991214 -> profit $1277.866899999997 (30623.79 * (1.0 - 0.9582720851991214))
+
+---
+
+## ETH | February 22, 1:40AM-1:45AM ET
+
+- **Price-to-beat**: $1975.7593
+- **RTDS WS**: $1973.6280405 (age=5899s, 0.0ms)
+- **Chainlink RPC**: $1975.479 (age=24s, 537ms)
+- **Speed**: RTDS WS faster by 537ms (RTDS WS 0.0ms vs RPC 537ms) | fresher: Chainlink RPC | price diff: $1.8509595000000445
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.2802999999998974)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:40AM-1:45AM ET
+
+- **Price-to-beat**: $1.42245025
+- **RTDS WS**: $1.4216189 (age=5899s, 0.0ms)
+- **Chainlink RPC**: $1.42254015 (age=6s, 581ms)
+- **Speed**: RTDS WS faster by 581ms (RTDS WS 0.0ms vs RPC 581ms) | fresher: Chainlink RPC | price diff: $0.0009212499999999846
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.00008989999999986509)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 1:45AM-1:50AM ET
+
+- **Price-to-beat**: $1975.6221
+- **RTDS WS**: $1973.6280405 (age=6199s, 0.0ms)
+- **Chainlink RPC**: $1974.9628133 (age=26s, 255ms)
+- **Speed**: RTDS WS faster by 255ms (RTDS WS 0.0ms vs RPC 255ms) | fresher: Chainlink RPC | price diff: $1.3347728000001098
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.6592866999999387)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:45AM-1:50AM ET
+
+- **Price-to-beat**: $1.4228489
+- **RTDS WS**: $1.4216189 (age=6199s, 0.0ms)
+- **Chainlink RPC**: $1.4228489 (age=20s, 349ms)
+- **Speed**: RTDS WS faster by 349ms (RTDS WS 0.0ms vs RPC 349ms) | fresher: Chainlink RPC | price diff: $0.0012300000000000644
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 802.5  | $794.475   |
+| 0.98  | 80  | $78.4   |
+| 0.97  | 230  | $223.1   |
+| 0.96  | 10  | $9.6   |
+| 0.95  | 25  | $23.75   |
+| 0.9  | 85  | $76.5   |
+| 0.87  | 10  | $8.7   |
+| 0.75  | 37  | $27.75   |
+| 0.5  | 8  | $4   |
+| 0.44  | 8  | $3.52   |
+| 0.4  | 5  | $2   |
+| 0.38  | 5.12  | $1.9456   |
+| 0.22  | 5.85  | $1.287   |
+| 0.01  | 15760.9  | $157.609   |
+
+- **Sweepable asks** ([0.9, 0.995]): 6 levels, 1232.5 shares, $1205.8249999999998 cost
+- **Hypothetical P&L**: buy 1232.5 @ avg 0.9783569979716022 -> profit $26.675000000000228 (1232.5 * (1.0 - 0.9783569979716022))
+
+---
+
+## BTC | February 22, 1:45AM-1:50AM ET
+
+- **Price-to-beat**: $68052.409984
+- **RTDS WS**: $67982.02593401316 (age=6199s, 0.0ms)
+- **Chainlink RPC**: $68052.409984 (age=22s, 692ms)
+- **Speed**: RTDS WS faster by 692ms (RTDS WS 0.0ms vs RPC 692ms) | fresher: Chainlink RPC | price diff: $70.38404998683836
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 8472.91  | $8388.1809   |
+| 0.98  | 2765  | $2709.7   |
+| 0.97  | 2098.32  | $2035.3704   |
+| 0.96  | 1645.72  | $1579.8912   |
+| 0.95  | 2025  | $1923.75   |
+| 0.94  | 186  | $174.84   |
+| 0.93  | 133  | $123.69000000000001   |
+| 0.92  | 63  | $57.96   |
+| 0.91  | 130  | $118.3   |
+| 0.9  | 319.7  | $287.73   |
+| 0.89  | 98  | $87.22   |
+| 0.88  | 25  | $22   |
+| 0.87  | 122  | $106.14   |
+| 0.85  | 83.74  | $71.17899999999999   |
+| 0.8  | 14.89  | $11.912   |
+| 0.75  | 10  | $7.5   |
+| 0.7  | 29.91  | $20.936999999999998   |
+| 0.66  | 7  | $4.62   |
+| 0.65  | 27  | $17.55   |
+| 0.64  | 7  | $4.48   |
+| 0.62  | 20.16  | $12.4992   |
+| 0.61  | 19  | $11.59   |
+| 0.6  | 169.41  | $101.646   |
+| 0.59  | 7  | $4.13   |
+| 0.57  | 24.68  | $14.067599999999999   |
+| 0.56  | 31  | $17.360000000000003   |
+| 0.55  | 18  | $9.9   |
+| 0.53  | 3.72  | $1.9716000000000002   |
+| 0.52  | 5  | $2.6   |
+| 0.51  | 10  | $5.1   |
+| 0.5  | 92.24  | $46.12   |
+| 0.49  | 64.71  | $31.707899999999995   |
+| 0.45  | 5  | $2.25   |
+| 0.4  | 5  | $2   |
+| 0.35  | 7  | $2.4499999999999997   |
+| 0.3  | 6.5  | $1.95   |
+| 0.25  | 6.1  | $1.525   |
+| 0.22  | 6.25  | $1.375   |
+| 0.21  | 16.99  | $3.5678999999999994   |
+| 0.2  | 8.5  | $1.7000000000000002   |
+| 0.15  | 50.81  | $7.6215   |
+| 0.13  | 18.98  | $2.4674   |
+| 0.11  | 23.59  | $2.5949   |
+| 0.1  | 17.6  | $1.7600000000000002   |
+| 0.08  | 10  | $0.8   |
+| 0.05  | 23.1  | $1.155   |
+| 0.04  | 21.52  | $0.8608   |
+| 0.03  | 10  | $0.3   |
+| 0.02  | 510.2  | $10.204   |
+| 0.01  | 80510.44  | $805.1044   |
+
+- **Sweepable asks** ([0.9, 0.995]): 10 levels, 17838.649999999998 shares, $17399.4125 cost
+- **Hypothetical P&L**: buy 17838.649999999998 @ avg 0.9753772006289714 -> profit $439.2374999999997 (17838.649999999998 * (1.0 - 0.9753772006289714))
+
+---
+
+## BTC | February 22, 1:50AM-1:55AM ET
+
+- **Price-to-beat**: $68054.81318533
+- **RTDS WS**: $67982.02593401316 (age=6499s, 0.0ms)
+- **Chainlink RPC**: $68046.053305 (age=24s, 778ms)
+- **Speed**: RTDS WS faster by 778ms (RTDS WS 0.0ms vs RPC 778ms) | fresher: Chainlink RPC | price diff: $64.02737098683428
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$8.759880330006126)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 1:50AM-1:55AM ET
+
+- **Price-to-beat**: $1.423289
+- **RTDS WS**: $1.4216189 (age=6499s, 0.0ms)
+- **Chainlink RPC**: $1.42331 (age=20s, 1453ms)
+- **Speed**: RTDS WS faster by 1453ms (RTDS WS 0.0ms vs RPC 1453ms) | fresher: Chainlink RPC | price diff: $0.0016911000000001675
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.000021000000000048757)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 187.36  | $185.4864   |
+| 0.96  | 15000  | $14400   |
+| 0.94  | 15000  | $14100   |
+| 0.89  | 8000  | $7120   |
+| 0.86  | 8000  | $6880   |
+| 0.82  | 21  | $17.22   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1005  | $582.9   |
+| 0.57  | 1000  | $570   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4000  | $1160   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.1  | 10636  | $1063.6000000000001   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11510  | $345.3   |
+| 0.02  | 18530  | $370.6   |
+| 0.01  | 465154.57  | $4651.545700000001   |
+
+- **Sweepable asks** ([0.9, 0.995]): 3 levels, 30187.36 shares, $28685.4864 cost
+- **Hypothetical P&L**: buy 30187.36 @ avg 0.9502482628490866 -> profit $1501.8735999999974 (30187.36 * (1.0 - 0.9502482628490866))
+
+---
+
+## XRP | February 22, 1:55AM-2:00AM ET
+
+- **Price-to-beat**: $1.42304765
+- **RTDS WS**: $1.4216189 (age=6799s, 0.0ms)
+- **Chainlink RPC**: $1.42304765 (age=34s, 484ms)
+- **Speed**: RTDS WS faster by 484ms (RTDS WS 0.0ms vs RPC 484ms) | fresher: Chainlink RPC | price diff: $0.0014287500000000897
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 732.49  | $725.1651   |
+| 0.98  | 80  | $78.4   |
+| 0.97  | 230  | $223.1   |
+| 0.96  | 10  | $9.6   |
+| 0.95  | 25  | $23.75   |
+| 0.9  | 5  | $4.5   |
+| 0.87  | 10  | $8.7   |
+| 0.76  | 33  | $25.080000000000002   |
+| 0.75  | 5  | $3.75   |
+| 0.55  | 5  | $2.75   |
+| 0.49  | 11.77  | $5.7673   |
+| 0.14  | 20.51  | $2.8714000000000004   |
+| 0.01  | 14919.58  | $149.1958   |
+
+- **Sweepable asks** ([0.9, 0.995]): 6 levels, 1082.49 shares, $1064.5150999999998 cost
+- **Hypothetical P&L**: buy 1082.49 @ avg 0.9833948581511144 -> profit $17.974900000000194 (1082.49 * (1.0 - 0.9833948581511144))
+
+---
+
+## BTC | February 22, 1:55AM-2:00AM ET
+
+- **Price-to-beat**: $68021.019
+- **RTDS WS**: $67982.02593401316 (age=6799s, 0.0ms)
+- **Chainlink RPC**: $68021.019 (age=16s, 512ms)
+- **Speed**: RTDS WS faster by 512ms (RTDS WS 0.0ms vs RPC 512ms) | fresher: Chainlink RPC | price diff: $38.99306598684052
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 1:55AM-2:00AM ET
+
+- **Price-to-beat**: $1975.10821966
+- **RTDS WS**: $1973.6280405 (age=6799s, 0.0ms)
+- **Chainlink RPC**: $1975.426 (age=32s, 1332ms)
+- **Speed**: RTDS WS faster by 1332ms (RTDS WS 0.0ms vs RPC 1332ms) | fresher: Chainlink RPC | price diff: $1.7979594999999335
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.3177803399998993)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 2:05AM-2:10AM ET
+
+- **Price-to-beat**: $1975.73467677
+- **RTDS WS**: $1973.6280405 (age=7399s, 0.0ms)
+- **Chainlink RPC**: $1975.365099 (age=24s, 1098ms)
+- **Speed**: RTDS WS faster by 1098ms (RTDS WS 0.0ms vs RPC 1098ms) | fresher: Chainlink RPC | price diff: $1.7370585000001029
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.36957776999997805)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 22, 2:05AM-2:10AM ET
+
+- **Price-to-beat**: $68017.365616
+- **RTDS WS**: $67982.02593401316 (age=7399s, 0.0ms)
+- **Chainlink RPC**: $67999.88351988 (age=0s, 492ms)
+- **Speed**: RTDS WS faster by 492ms (RTDS WS 0.0ms vs RPC 492ms) | fresher: Chainlink RPC | price diff: $17.857585866833688
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$17.482096120002097)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:10AM-2:15AM ET
+
+- **Price-to-beat**: $1.41979263
+- **RTDS WS**: $1.4216189 (age=7699s, 0.0ms)
+- **Chainlink RPC**: $1.42018081 (age=2s, 719ms)
+- **Speed**: RTDS WS faster by 719ms (RTDS WS 0.0ms vs RPC 719ms) | fresher: Chainlink RPC | price diff: $0.0014380899999999475
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.0003881799999998492)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:15AM-2:20AM ET
+
+- **Price-to-beat**: $1.4198293
+- **RTDS WS**: $1.4216189 (age=7999s, 0.0ms)
+- **Chainlink RPC**: $1.4193722 (age=6s, 306ms)
+- **Speed**: RTDS WS faster by 306ms (RTDS WS 0.0ms vs RPC 306ms) | fresher: Chainlink RPC | price diff: $0.002246699999999935
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.00045709999999998807)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 22, 2:15AM-2:20AM ET
+
+- **Price-to-beat**: $67997.931148
+- **RTDS WS**: $67982.02593401316 (age=7999s, 0.0ms)
+- **Chainlink RPC**: $67989.521397 (age=4s, 9275ms)
+- **Speed**: RTDS WS faster by 9275ms (RTDS WS 0.0ms vs RPC 9275ms) | fresher: Chainlink RPC | price diff: $7.495462986844359
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$8.409750999999233)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:20AM-2:25AM ET
+
+- **Price-to-beat**: $1.42138755
+- **RTDS WS**: $1.4216189 (age=8922s, 0.0ms)
+- **Chainlink RPC**: $1.4212341 (age=29s, 788ms)
+- **Speed**: RTDS WS faster by 788ms (RTDS WS 0.0ms vs RPC 788ms) | fresher: Chainlink RPC | price diff: $0.00038479999999996295
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.00015344999999999942)
+
+### Winning token orderbook (Down)
+
+- **Orderbook fetch failed**: Failed to parse orderbook
+
+---
+
+## ETH | February 22, 2:20AM-2:25AM ET
+
+- **Price-to-beat**: $1974.647238
+- **RTDS WS**: $1973.6280405 (age=8922s, 0.0ms)
+- **Chainlink RPC**: $1976.0629 (age=9s, 956ms)
+- **Speed**: RTDS WS faster by 956ms (RTDS WS 0.0ms vs RPC 956ms) | fresher: Chainlink RPC | price diff: $2.4348594999999023
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$1.4156619999998838)
+
+### Winning token orderbook (Up)
+
+- **Orderbook fetch failed**: Failed to parse orderbook
+
+---
+
+## BTC | February 22, 2:20AM-2:25AM ET
+
+- **Price-to-beat**: $67991.156279
+- **RTDS WS**: $67982.02593401316 (age=8921s, 0.0ms)
+- **Chainlink RPC**: $68028.34917712 (age=32s, 1261ms)
+- **Speed**: RTDS WS faster by 1261ms (RTDS WS 0.0ms vs RPC 1261ms) | fresher: Chainlink RPC | price diff: $46.32324310684635
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$37.19289812000352)
+
+### Winning token orderbook (Up)
+
+- **Orderbook fetch failed**: Failed to fetch orderbook
+
+---
+
+## BTC | February 22, 2:35AM-2:40AM ET
+
+- **Price-to-beat**: $68031.44
+- **RTDS WS**: $67982.02593401316 (age=9199s, 0.0ms)
+- **Chainlink RPC**: $68024.44 (age=12s, 475ms)
+- **Speed**: RTDS WS faster by 475ms (RTDS WS 0.0ms vs RPC 475ms) | fresher: Chainlink RPC | price diff: $42.414065986842616
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$7)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 2:35AM-2:40AM ET
+
+- **Price-to-beat**: $1976.236
+- **RTDS WS**: $1973.6280405 (age=9199s, 0.0ms)
+- **Chainlink RPC**: $1976.35 (age=22s, 836ms)
+- **Speed**: RTDS WS faster by 836ms (RTDS WS 0.0ms vs RPC 836ms) | fresher: Chainlink RPC | price diff: $2.7219594999999117
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.11399999999980537)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:35AM-2:40AM ET
+
+- **Price-to-beat**: $1.42184
+- **RTDS WS**: $1.4216189 (age=9199s, 0.0ms)
+- **Chainlink RPC**: $1.42031256 (age=32s, 917ms)
+- **Speed**: RTDS WS faster by 917ms (RTDS WS 0.0ms vs RPC 917ms) | fresher: Chainlink RPC | price diff: $0.0013063399999999614
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.0015274400000000465)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:40AM-2:45AM ET
+
+- **Price-to-beat**: $1.42155788
+- **RTDS WS**: $1.4216189 (age=9499s, 0.0ms)
+- **Chainlink RPC**: $1.42152921 (age=20s, 789ms)
+- **Speed**: RTDS WS faster by 789ms (RTDS WS 0.0ms vs RPC 789ms) | fresher: Chainlink RPC | price diff: $0.00008968999999980909
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.000028669999999841878)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 1947.5  | $1928.025   |
+| 0.98  | 70  | $68.6   |
+| 0.97  | 725  | $703.25   |
+| 0.96  | 15010  | $14409.6   |
+| 0.95  | 30  | $28.5   |
+| 0.94  | 15000  | $14100   |
+| 0.9  | 5  | $4.5   |
+| 0.89  | 8561.67  | $7619.8863   |
+| 0.87  | 10  | $8.7   |
+| 0.86  | 8000  | $6880   |
+| 0.77  | 34  | $26.18   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.5  | 5  | $2.5   |
+| 0.49  | 15  | $7.35   |
+| 0.45  | 5.45  | $2.4525   |
+| 0.4  | 5  | $2   |
+| 0.341  | 9.1  | $3.1031   |
+| 0.3  | 5515  | $1654.5   |
+| 0.29  | 4000  | $1160   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.1  | 10652  | $1065.2   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20710  | $1656.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8514.82  | $425.741   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11631.25  | $348.9375   |
+| 0.02  | 18597.32  | $371.9464   |
+| 0.01  | 360897.77  | $3608.9777000000004   |
+| 0.001  | 195485.11  | $195.48511   |
+
+- **Sweepable asks** ([0.9, 0.995]): 7 levels, 32787.5 shares, $31242.475 cost
+- **Hypothetical P&L**: buy 32787.5 @ avg 0.9528776210446054 -> profit $1545.025000000001 (32787.5 * (1.0 - 0.9528776210446054))
+
+---
+
+## BTC | February 22, 2:40AM-2:45AM ET
+
+- **Price-to-beat**: $68063.588606
+- **RTDS WS**: $67982.02593401316 (age=9499s, 0.0ms)
+- **Chainlink RPC**: $68063.99766096 (age=16s, 1662ms)
+- **Speed**: RTDS WS faster by 1662ms (RTDS WS 0.0ms vs RPC 1662ms) | fresher: Chainlink RPC | price diff: $81.97172694683832
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.4090549599932274)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 2:40AM-2:45AM ET
+
+- **Price-to-beat**: $1976.72
+- **RTDS WS**: $1973.6280405 (age=9499s, 0.0ms)
+- **Chainlink RPC**: $1976.79 (age=24s, 5302ms)
+- **Speed**: RTDS WS faster by 5302ms (RTDS WS 0.0ms vs RPC 5302ms) | fresher: Chainlink RPC | price diff: $3.1619594999999663
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.06999999999993634)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:45AM-2:50AM ET
+
+- **Price-to-beat**: $1.42140845
+- **RTDS WS**: $1.4216189 (age=9799s, 0.0ms)
+- **Chainlink RPC**: $1.42153 (age=12s, 1559ms)
+- **Speed**: RTDS WS faster by 1559ms (RTDS WS 0.0ms vs RPC 1559ms) | fresher: Chainlink RPC | price diff: $0.00008889999999994735
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.0001215500000000258)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 1457.13  | $1442.5587   |
+| 0.98  | 370  | $362.59999999999997   |
+| 0.97  | 108.33  | $105.0801   |
+| 0.96  | 15010  | $14409.6   |
+| 0.95  | 30  | $28.5   |
+| 0.94  | 15000  | $14100   |
+| 0.9  | 5  | $4.5   |
+| 0.89  | 8000  | $7120   |
+| 0.87  | 10  | $8.7   |
+| 0.86  | 8000  | $6880   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.51  | 45  | $22.95   |
+| 0.5  | 7.19  | $3.595   |
+| 0.49  | 15  | $7.35   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4000  | $1160   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.11  | 22.47  | $2.4717   |
+| 0.1  | 10652  | $1065.2   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11510  | $345.3   |
+| 0.02  | 18530  | $370.6   |
+| 0.01  | 464872.59  | $4648.7259   |
+
+- **Sweepable asks** ([0.9, 0.995]): 7 levels, 31980.46 shares, $30452.838799999998 cost
+- **Hypothetical P&L**: buy 31980.46 @ avg 0.9522326695738584 -> profit $1527.6212000000032 (31980.46 * (1.0 - 0.9522326695738584))
+
+---
+
+## BTC | February 22, 2:45AM-2:50AM ET
+
+- **Price-to-beat**: $68049.75
+- **RTDS WS**: $67982.02593401316 (age=9799s, 0.0ms)
+- **Chainlink RPC**: $68049.75 (age=116s, 2938ms)
+- **Speed**: RTDS WS faster by 2938ms (RTDS WS 0.0ms vs RPC 2938ms) | fresher: Chainlink RPC | price diff: $67.72406598684029
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 2:45AM-2:50AM ET
+
+- **Price-to-beat**: $1976.9387
+- **RTDS WS**: $1973.6280405 (age=9799s, 0.0ms)
+- **Chainlink RPC**: $1976.86336157 (age=26s, 2961ms)
+- **Speed**: RTDS WS faster by 2961ms (RTDS WS 0.0ms vs RPC 2961ms) | fresher: Chainlink RPC | price diff: $3.2353210700000545
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.07533842999987428)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## BTC | February 22, 2:50AM-2:55AM ET
+
+- **Price-to-beat**: $68052.44310545
+- **RTDS WS**: $67982.02593401316 (age=10099s, 0.0ms)
+- **Chainlink RPC**: $67997.7556034 (age=10s, 1292ms)
+- **Speed**: RTDS WS faster by 1292ms (RTDS WS 0.0ms vs RPC 1292ms) | fresher: Chainlink RPC | price diff: $15.729669386841124
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$54.68750205000106)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:50AM-2:55AM ET
+
+- **Price-to-beat**: $1.422674
+- **RTDS WS**: $1.4216189 (age=10099s, 0.0ms)
+- **Chainlink RPC**: $1.42181948 (age=4s, 1368ms)
+- **Speed**: RTDS WS faster by 1368ms (RTDS WS 0.0ms vs RPC 1368ms) | fresher: Chainlink RPC | price diff: $0.00020058000000000575
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=-$0.0008545200000000808)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 1137.4  | $1126.026   |
+| 0.98  | 25.53  | $25.0194   |
+| 0.96  | 15200  | $14592   |
+| 0.94  | 15000  | $14100   |
+| 0.89  | 8000  | $7120   |
+| 0.86  | 8000  | $6880   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.44  | 10.69  | $4.7036   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 4013  | $1163.77   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.11  | 23.59  | $2.5949   |
+| 0.1  | 10652  | $1065.2   |
+| 0.09  | 12510  | $1125.8999999999999   |
+| 0.08  | 20510  | $1640.8   |
+| 0.07  | 8510  | $595.7   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8510  | $425.5   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11510  | $345.3   |
+| 0.02  | 18530  | $370.6   |
+| 0.01  | 477070.58  | $4770.705800000001   |
+
+- **Sweepable asks** ([0.9, 0.995]): 4 levels, 31362.93 shares, $29843.0454 cost
+- **Hypothetical P&L**: buy 31362.93 @ avg 0.951538819874291 -> profit $1519.8846000000024 (31362.93 * (1.0 - 0.951538819874291))
+
+---
+
+## ETH | February 22, 2:50AM-2:55AM ET
+
+- **Price-to-beat**: $1975.65262662
+- **RTDS WS**: $1973.6280405 (age=10099s, 0.0ms)
+- **Chainlink RPC**: $1975.66 (age=28s, 1142ms)
+- **Speed**: RTDS WS faster by 1142ms (RTDS WS 0.0ms vs RPC 1142ms) | fresher: Chainlink RPC | price diff: $2.0319595000000845
+- **Best source**: Chainlink RPC
+- **Winner**: Up (diff=+$0.007373379999989993)
+
+### Winning token orderbook (Up)
+| Price | Size | USD Value |
+|-------|------|-----------|
+| 0.99  | 2132.5  | $2111.175   |
+| 0.98  | 440.94  | $432.1212   |
+| 0.97  | 50  | $48.5   |
+| 0.96  | 15210  | $14601.6   |
+| 0.95  | 60  | $57   |
+| 0.94  | 15000  | $14100   |
+| 0.92  | 6  | $5.5200000000000005   |
+| 0.9  | 80  | $72   |
+| 0.89  | 8000  | $7120   |
+| 0.86  | 8000  | $6880   |
+| 0.75  | 32  | $24   |
+| 0.7  | 12.29  | $8.602999999999998   |
+| 0.6  | 5510  | $3306   |
+| 0.58  | 1000  | $580   |
+| 0.57  | 1000  | $570   |
+| 0.46  | 11.09  | $5.1014   |
+| 0.3  | 5510  | $1653   |
+| 0.29  | 3000  | $869.9999999999999   |
+| 0.27  | 5000  | $1350   |
+| 0.2  | 5510  | $1102   |
+| 0.17  | 20  | $3.4000000000000004   |
+| 0.16  | 20  | $3.2   |
+| 0.15  | 20  | $3   |
+| 0.1  | 10652  | $1065.2   |
+| 0.09  | 11510  | $1035.8999999999999   |
+| 0.08  | 20564.13  | $1645.1304   |
+| 0.07  | 8526.4  | $596.8480000000001   |
+| 0.06  | 8510  | $510.59999999999997   |
+| 0.05  | 8515  | $425.75   |
+| 0.04  | 17510  | $700.4   |
+| 0.03  | 11574.33  | $347.2299   |
+| 0.02  | 21600.44  | $432.0088   |
+| 0.01  | 468589.88  | $4685.8988   |
+
+- **Sweepable asks** ([0.9, 0.995]): 8 levels, 32979.44 shares, $31427.9162 cost
+- **Hypothetical P&L**: buy 32979.44 @ avg 0.9529548166979184 -> profit $1551.5238000000031 (32979.44 * (1.0 - 0.9529548166979184))
+
+---
+
+## BTC | February 22, 2:55AM-3:00AM ET
+
+- **Price-to-beat**: $67997.121443
+- **RTDS WS**: $67982.02593401316 (age=10399s, 0.0ms)
+- **Chainlink RPC**: $68182.55 (age=77762s, 482ms)
+- **Speed**: RTDS WS faster by 482ms (RTDS WS 0.0ms vs RPC 482ms) | fresher: RTDS WS | price diff: $200.5240659868432
+- **Best source**: RTDS WS
+- **Winner**: Down (diff=-$15.095508986836649)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## ETH | February 22, 2:55AM-3:00AM ET
+
+- **Price-to-beat**: $1975.707921
+- **RTDS WS**: $1973.6280405 (age=10399s, 0.0ms)
+- **Chainlink RPC**: $2849.79 (age=5751138s, 323ms)
+- **Speed**: RTDS WS faster by 323ms (RTDS WS 0.0ms vs RPC 323ms) | fresher: RTDS WS | price diff: $876.1619595
+- **Best source**: RTDS WS
+- **Winner**: Down (diff=-$2.0798804999999447)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+
+## XRP | February 22, 2:55AM-3:00AM ET
+
+- **Price-to-beat**: $1.42096649
+- **RTDS WS**: $1.4216189 (age=10399s, 0.0ms)
+- **Chainlink RPC**: $1.42096649 (age=6s, 558ms)
+- **Speed**: RTDS WS faster by 558ms (RTDS WS 0.0ms vs RPC 558ms) | fresher: Chainlink RPC | price diff: $0.0006524099999998256
+- **Best source**: Chainlink RPC
+- **Winner**: Down (diff=+$0)
+
+### Winning token orderbook (Down)
+| Price | Size | USD Value |
+|-------|------|-----------|
+
+- **Sweepable asks** ([0.9, 0.995]): 0 levels, 0 shares, $0 cost
+- **Hypothetical P&L**: no sweepable asks
+
+---
+

@@ -2,15 +2,18 @@ mod api;
 mod chainlink;
 mod config;
 mod discovery;
+mod log_buffer;
 mod models;
 mod paper_trade;
 mod rtds;
 mod strategy;
+mod web;
 
 
 use anyhow::Result;
 use clap::Parser;
 use config::{Args, Config};
+use log_buffer::LogBuffer;
 use std::io::Write;
 use std::sync::Arc;
 use api::PolymarketApi;
@@ -45,6 +48,10 @@ async fn main() -> Result<()> {
         return Ok(());
     }
 
+    // Start web dashboard
+    let log_buffer = LogBuffer::new();
+    web::spawn_dashboard(log_buffer.clone()).await;
+
     if config.polymarket.private_key.is_some() {
         if let Err(e) = api.authenticate().await {
             log::error!("Authentication failed: {}", e);
@@ -54,7 +61,7 @@ async fn main() -> Result<()> {
         log::warn!("⚠️ No private key provided. Bot can only monitor (no orders).");
     }
 
-    let strategy = ArbStrategy::new(api, config);
+    let strategy = ArbStrategy::new(api, config, log_buffer);
     strategy.run().await
 }
 

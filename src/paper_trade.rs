@@ -4,6 +4,7 @@
 use crate::api::PolymarketApi;
 use crate::config::StrategyConfig;
 use crate::discovery::format_5m_period_et;
+use crate::log_buffer::LogBuffer;
 use crate::rtds::LatestPriceCache;
 use chrono::Utc;
 use log::error;
@@ -18,14 +19,16 @@ pub struct PaperTradeLogger {
     api: Arc<PolymarketApi>,
     latest_prices: LatestPriceCache,
     file_mutex: Arc<Mutex<()>>,
+    log_buffer: LogBuffer,
 }
 
 impl PaperTradeLogger {
-    pub fn new(api: Arc<PolymarketApi>, latest_prices: LatestPriceCache) -> Self {
+    pub fn new(api: Arc<PolymarketApi>, latest_prices: LatestPriceCache, log_buffer: LogBuffer) -> Self {
         Self {
             api,
             latest_prices,
             file_mutex: Arc::new(Mutex::new(())),
+            log_buffer,
         }
     }
 
@@ -146,6 +149,7 @@ impl PaperTradeLogger {
                 let _ = writeln!(md, "- **NO CLOSE PRICE** - cannot determine winner\n");
                 let _ = writeln!(md, "---\n");
                 self.append(&md).await;
+                self.log_buffer.push(symbol, "warn", format!("{} | no close price available", period_str)).await;
                 return;
             }
         };
@@ -159,6 +163,7 @@ impl PaperTradeLogger {
             );
             let _ = writeln!(md, "---\n");
             self.append(&md).await;
+            self.log_buffer.push(symbol, "warn", format!("{} | stale price ({}s old)", period_str, best_age_s)).await;
             return;
         }
 
@@ -170,6 +175,7 @@ impl PaperTradeLogger {
             let _ = writeln!(md, "- **Winner**: NONE (tied) — diff=0, skipping\n");
             let _ = writeln!(md, "---\n");
             self.append(&md).await;
+            self.log_buffer.push(symbol, "info", format!("{} | tied (ptb=${}, close=${})", period_str, price_to_beat, latest_price)).await;
             return;
         }
 
@@ -183,6 +189,7 @@ impl PaperTradeLogger {
             );
             let _ = writeln!(md, "---\n");
             self.append(&md).await;
+            self.log_buffer.push(symbol, "info", format!("{} | below margin (diff=${})", period_str, diff.abs())).await;
             return;
         }
 
@@ -262,18 +269,41 @@ impl PaperTradeLogger {
                         "- **Hypothetical P&L**: buy {:.2} shares @ avg {:.4} -> profit ${:.2}\n",
                         capped_shares, avg_price, profit
                     );
+                    let _ = writeln!(md, "---\n");
+                    self.append(&md).await;
+                    self.log_buffer.push(
+                        symbol,
+                        "info",
+                        format!(
+                            "{} | winner={} ptb=${} close=${} diff={}{} | {:.2} shares @ avg {:.4} -> P&L ${:.2}",
+                            period_str, winner, price_to_beat, latest_price,
+                            if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
+                            capped_shares, avg_price, profit
+                        ),
+                    ).await;
                 } else {
                     let _ = writeln!(md, "- **Hypothetical P&L**: no sweepable asks\n");
+                    let _ = writeln!(md, "---\n");
+                    self.append(&md).await;
+                    self.log_buffer.push(
+                        symbol,
+                        "info",
+                        format!(
+                            "{} | winner={} ptb=${} close=${} diff={}{} | no sweepable asks",
+                            period_str, winner, price_to_beat, latest_price,
+                            if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
+                        ),
+                    ).await;
                 }
             }
             Err(e) => {
                 let _ = writeln!(md, "### Winning token orderbook ({})\n", winner);
                 let _ = writeln!(md, "- **Orderbook fetch failed**: {}\n", e);
+                let _ = writeln!(md, "---\n");
+                self.append(&md).await;
+                self.log_buffer.push(symbol, "error", format!("{} | orderbook failed: {}", period_str, e)).await;
             }
         }
-
-        let _ = writeln!(md, "---\n");
-        self.append(&md).await;
     }
 
     /// Append content to paper_trade.md, guarded by mutex.
