@@ -27,17 +27,12 @@ pub struct StrategyConfig {
     /// 5m market symbols (e.g. btc, eth, sol, xrp). Slug format: {symbol}-updown-5m-{period}.
     #[serde(default = "default_symbols")]
     pub symbols: Vec<String>,
-    #[serde(default)]
-    pub simulation_mode: bool,
     /// Enable post-close sweep: buy winning tokens from stale limit orders after market closes.
     #[serde(default)]
     pub sweep_enabled: bool,
     /// Max ask price to buy winning tokens (e.g. 0.999 = pay at most 99.9c for a $1 token).
     #[serde(default = "default_sweep_max_price")]
     pub sweep_max_price: f64,
-    /// Min ask price to consider (safety floor for parsing errors only, not a strategy filter).
-    #[serde(default = "default_sweep_min_price")]
-    pub sweep_min_price: f64,
     /// Seconds to sweep before giving up.
     #[serde(default = "default_sweep_timeout_secs")]
     pub sweep_timeout_secs: u64,
@@ -59,9 +54,6 @@ fn default_symbols() -> Vec<String> {
 fn default_sweep_max_price() -> f64 {
     0.999
 }
-fn default_sweep_min_price() -> f64 {
-    0.01
-}
 fn default_sweep_timeout_secs() -> u64 {
     30
 }
@@ -82,7 +74,7 @@ pub struct PolymarketConfig {
     pub private_key: Option<String>,
     pub proxy_wallet_address: Option<String>,
     pub signature_type: Option<u8>,
-    /// Polygon RPC URLs (tried in order as fallbacks for Chainlink price reads and redemption).
+    /// Polygon RPC URLs (tried in order as fallbacks for redemption).
     #[serde(default = "default_rpc_urls")]
     pub rpc_urls: Vec<String>,
     /// WebSocket base URL for market channel (e.g. wss://ws-subscriptions-clob.polymarket.com).
@@ -123,10 +115,8 @@ impl Default for Config {
             },
             strategy: StrategyConfig {
                 symbols: default_symbols(),
-                simulation_mode: false,
                 sweep_enabled: false,
                 sweep_max_price: default_sweep_max_price(),
-                sweep_min_price: default_sweep_min_price(),
                 sweep_timeout_secs: default_sweep_timeout_secs(),
                 sweep_inter_order_delay_ms: default_sweep_inter_order_delay_ms(),
                 sweep_min_margin_pct: default_sweep_min_margin_pct(),
@@ -154,9 +144,6 @@ impl Config {
         }
         if let Ok(v) = std::env::var("SIGNATURE_TYPE") {
             config.polymarket.signature_type = v.parse().ok();
-        }
-        if let Ok(v) = std::env::var("SIMULATION_MODE") {
-            config.strategy.simulation_mode = v == "true" || v == "1";
         }
         if let Ok(v) = std::env::var("SWEEP_ENABLED") {
             config.strategy.sweep_enabled = v == "true" || v == "1";

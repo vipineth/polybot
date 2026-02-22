@@ -1,7 +1,6 @@
 //! Paper trade logger: after each 5m round, log what we *would* have traded
 //! to paper_trade.md. Pure observation — no orders placed.
 
-use crate::api::PolymarketApi;
 use crate::config::StrategyConfig;
 use crate::discovery::format_5m_period_et;
 use crate::log_buffer::LogBuffer;
@@ -17,7 +16,6 @@ use tokio::sync::Mutex;
 /// Shared handle for paper trade logging across concurrent symbol loops.
 #[derive(Clone)]
 pub struct PaperTradeLogger {
-    api: Arc<PolymarketApi>,
     latest_prices: LatestPriceCache,
     orderbook_mirror: Arc<OrderbookMirror>,
     file_mutex: Arc<Mutex<()>>,
@@ -26,7 +24,6 @@ pub struct PaperTradeLogger {
 
 impl PaperTradeLogger {
     pub fn new(
-        api: Arc<PolymarketApi>,
         latest_prices: LatestPriceCache,
         orderbook_mirror: Arc<OrderbookMirror>,
         log_buffer: LogBuffer,
@@ -53,7 +50,6 @@ impl PaperTradeLogger {
             }
         }
         Self {
-            api,
             latest_prices,
             orderbook_mirror,
             file_mutex: Arc::new(Mutex::new(())),
@@ -105,7 +101,6 @@ impl PaperTradeLogger {
             None => { let _ = writeln!(md, "- **RTDS WS**: unavailable"); }
         }
 
-        let best_age_s = age_s;
         let latest_price = match latest_price_opt {
             Some(p) => p,
             None => {
@@ -116,19 +111,6 @@ impl PaperTradeLogger {
                 return;
             }
         };
-
-        // Staleness check (consistency with real strategy)
-        if best_age_s > cfg.sweep_timeout_secs as i64 {
-            let _ = writeln!(
-                md,
-                "- **STALE** — price is {}s old (max {}s), would skip in live mode\n",
-                best_age_s, cfg.sweep_timeout_secs
-            );
-            let _ = writeln!(md, "---\n");
-            self.append(&md).await;
-            self.log_buffer.push(symbol, "warn", format!("{} | stale price ({}s old)", period_str, best_age_s)).await;
-            return;
-        }
 
         // Determine winner
         let diff = latest_price - price_to_beat;
@@ -170,16 +152,11 @@ impl PaperTradeLogger {
             diff.abs(),
         );
 
-        // Fetch orderbook for winning token (WS mirror first, REST fallback)
-        let (orderbook_result, ob_source) =
-            if let Some(ob) = self.orderbook_mirror.get_orderbook(winning_token).await {
-                (Ok(ob), "WS mirror")
-            } else {
-                (self.api.get_orderbook(winning_token).await, "REST")
-            };
-        match orderbook_result {
-            Ok(orderbook) => {
-                let _ = writeln!(md, "### Winning token orderbook ({}) [source: {}]", winner, ob_source);
+        // Fetch orderbook for winning token from WS mirror
+        let orderbook_opt = self.orderbook_mirror.get_orderbook(winning_token).await;
+        match orderbook_opt {
+            Some(orderbook) => {
+                let _ = writeln!(md, "### Winning token orderbook ({})", winner);
                 let _ = writeln!(md, "| Price | Size | USD Value |");
                 let _ = writeln!(md, "|-------|------|-----------|");
 
@@ -198,7 +175,7 @@ impl PaperTradeLogger {
                     let p: f64 = ask.price.to_string().parse().unwrap_or(1.0);
                     let s: f64 = ask.size.to_string().parse().unwrap_or(0.0);
                     let usd = p * s;
-                    let in_range = p >= cfg.sweep_min_price && p <= cfg.sweep_max_price;
+                    let in_range = p <= cfg.sweep_max_price;
                     let marker = if in_range && capped_cost < cfg.max_sweep_cost { " *" } else { "" };
                     let _ = writeln!(md, "| {}  | {}  | ${}  |{}", p, s, usd, marker);
 
@@ -265,12 +242,12 @@ impl PaperTradeLogger {
                     ).await;
                 }
             }
-            Err(e) => {
+            None => {
                 let _ = writeln!(md, "### Winning token orderbook ({})\n", winner);
-                let _ = writeln!(md, "- **Orderbook fetch failed**: {}\n", e);
+                let _ = writeln!(md, "- **No orderbook in WS mirror**\n");
                 let _ = writeln!(md, "---\n");
                 self.append(&md).await;
-                self.log_buffer.push(symbol, "error", format!("{} | orderbook failed: {}", period_str, e)).await;
+                self.log_buffer.push(symbol, "info", format!("{} | no orderbook in WS mirror", period_str)).await;
             }
         }
     }

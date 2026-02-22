@@ -37,7 +37,7 @@ impl ArbStrategy {
     pub fn new(api: Arc<PolymarketApi>, config: Config, log_buffer: LogBuffer) -> Self {
         let latest_prices: LatestPriceCache = Arc::new(RwLock::new(HashMap::new()));
         let orderbook_mirror = Arc::new(OrderbookMirror::new());
-        let paper_trader = PaperTradeLogger::new(api.clone(), Arc::clone(&latest_prices), Arc::clone(&orderbook_mirror), log_buffer.clone());
+        let paper_trader = PaperTradeLogger::new(Arc::clone(&latest_prices), Arc::clone(&orderbook_mirror), log_buffer.clone());
         Self {
             discovery: MarketDiscovery::new(api.clone()),
             api,
@@ -124,11 +124,11 @@ impl ArbStrategy {
             cache.get(symbol).copied()
         };
 
-        let (latest_price, age_secs) = match rtds_result {
+        let latest_price = match rtds_result {
             Some((p, ts)) => {
                 let age = (now_ms - ts) / 1000;
                 info!("Sweep {} RTDS WS: ${} (age={}s)", symbol, p, age);
-                (p, age)
+                p
             }
             None => {
                 warn!("Sweep {}: no RTDS WS price available, skipping.", symbol);
@@ -147,15 +147,6 @@ impl ArbStrategy {
             || price_to_beat < 0.001 || price_to_beat > 1_000_000.0
         {
             warn!("Sweep {}: price_to_beat {} fails sanity check, skipping.", symbol, price_to_beat);
-            return Ok((0, 0.0, 0.0));
-        }
-
-        // Check staleness
-        if age_secs > cfg.sweep_timeout_secs as i64 {
-            warn!(
-                "Sweep {}: best price is {}s old (max {}s), skipping.",
-                symbol, age_secs, cfg.sweep_timeout_secs
-            );
             return Ok((0, 0.0, 0.0));
         }
 
@@ -197,12 +188,7 @@ impl ArbStrategy {
         );
         self.log_buffer.push(symbol, "info", format!("sweep winner={} (price=${}, ptb=${}, diff={})", winner, latest_price, price_to_beat, diff)).await;
 
-        if self.config.strategy.simulation_mode {
-            info!("Sweep {}: SIMULATION MODE - would sweep {} token, skipping actual orders.", symbol, winner);
-            return Ok((0, 0.0, 0.0));
-        }
-
-        // 6. Sweep loop (until timeout)
+        // Sweep loop (until timeout)
         let sweep_start = std::time::Instant::now();
         let timeout = Duration::from_secs(cfg.sweep_timeout_secs);
         let mut total_orders: u32 = 0;
@@ -217,16 +203,13 @@ impl ArbStrategy {
                 break;
             }
 
-            // a. Read orderbook from WS mirror (instant), fall back to REST
-            let orderbook = if let Some(ob) = self.orderbook_mirror.get_orderbook(winning_token).await {
-                ob
-            } else {
-                match self.api.get_orderbook(winning_token).await {
-                    Ok(ob) => ob,
-                    Err(e) => {
-                        warn!("Sweep {}: orderbook fetch failed: {}", symbol, e);
-                        break;
-                    }
+            // Read orderbook from WS mirror (instant)
+            let orderbook = match self.orderbook_mirror.get_orderbook(winning_token).await {
+                Some(ob) => ob,
+                None => {
+                    warn!("Sweep {}: no orderbook in WS mirror, waiting for update...", symbol);
+                    self.orderbook_mirror.wait_for_update(Duration::from_secs(3)).await;
+                    continue;
                 }
             };
 
@@ -238,7 +221,7 @@ impl ArbStrategy {
                 .iter()
                 .filter(|a| {
                     let p = a.price.to_string().parse::<f64>().unwrap_or(1.0);
-                    p >= cfg.sweep_min_price && p <= cfg.sweep_max_price
+                    p <= cfg.sweep_max_price
                 })
                 .collect();
             eligible_asks.sort_by(|a, b| b.price.cmp(&a.price));
@@ -455,8 +438,8 @@ impl ArbStrategy {
     pub async fn run(&self) -> Result<()> {
         let symbols = &self.config.strategy.symbols;
         let cfg = &self.config.strategy;
-        info!("--- 5m bot | symbols: {:?} | sweep={} | sim={} ---",
-            symbols, cfg.sweep_enabled, cfg.simulation_mode
+        info!("--- 5m bot | symbols: {:?} | sweep={} ---",
+            symbols, cfg.sweep_enabled
         );
 
         let rtds_url = self.config.polymarket.rtds_ws_url.clone();
