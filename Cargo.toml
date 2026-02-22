@@ -17,7 +17,7 @@ env_logger = "0.11"
 log = "0.4"
 rust_decimal = "1.33"
 hex = "0.4"
-polymarket-client-sdk = { version = "0.4.2", features = ["clob"] }
+polymarket-client-sdk = { version = "0.4.2", features = ["clob", "ws"] }
 alloy = { version = "1.3", features = ["full"] }
 alloy-contract = "1.3"
 alloy-sol-types = "1.5"
@@ -25,3 +25,4 @@ chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = "0.9"
 axum = "0.8"
 async-stream = "0.3"
+rustls = { version = "0.23", features = ["ring"] }

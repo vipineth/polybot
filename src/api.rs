@@ -3,6 +3,7 @@ use anyhow::{Context, Result};
 use reqwest::Client;
 use serde_json::Value;
 use std::str::FromStr;
+use std::sync::OnceLock;
 use hex;
 use log::{info, warn};
 
@@ -41,6 +42,7 @@ pub struct PolymarketApi {
     proxy_wallet_address: Option<String>,
     signature_type: Option<u8>,
     rpc_urls: Vec<String>,
+    clob_auth: OnceLock<(PrivateKeySigner, ClobClient<Authenticated<Normal>>)>,
 }
 
 impl PolymarketApi {
@@ -64,6 +66,7 @@ impl PolymarketApi {
             proxy_wallet_address,
             signature_type,
             rpc_urls,
+            clob_auth: OnceLock::new(),
         }
     }
 
@@ -116,9 +119,12 @@ impl PolymarketApi {
         Ok((signer, client))
     }
 
-    // Authenticate with Polymarket CLOB API
+    // Authenticate with Polymarket CLOB API and cache the client for reuse.
     pub async fn authenticate(&self) -> Result<()> {
-        let (_signer, _client) = self.build_clob_client().await?;
+        let (signer, client) = self.build_clob_client().await?;
+        self.clob_auth
+            .set((signer, client))
+            .map_err(|_| anyhow::anyhow!("CLOB client already initialized"))?;
 
         eprintln!("   Successfully authenticated with Polymarket CLOB API");
         eprintln!("   Private key: Valid");
@@ -128,6 +134,33 @@ impl PolymarketApi {
         } else {
             eprintln!("   Trading account: EOA (private key account)");
         }
+        Ok(())
+    }
+
+    /// Get the cached authenticated CLOB client. Errors if `authenticate()` hasn't been called.
+    fn get_clob_client(&self) -> Result<&(PrivateKeySigner, ClobClient<Authenticated<Normal>>)> {
+        self.clob_auth
+            .get()
+            .ok_or_else(|| anyhow::anyhow!("CLOB client not initialized. Call authenticate() first."))
+    }
+
+    /// Pre-warm the SDK's DashMap cache for fee_rate_bps and tick_size for a token.
+    /// Call this during market discovery so the values are cached before the sweep critical path.
+    pub async fn warm_order_cache(&self, token_id: &str) -> Result<()> {
+        let (_, client) = self.get_clob_client()?;
+        let token_id_u256 = if token_id.starts_with("0x") {
+            U256::from_str_radix(token_id.trim_start_matches("0x"), 16)
+        } else {
+            U256::from_str_radix(token_id, 10)
+        }
+        .context(format!("Failed to parse token_id as U256: {}", token_id))?;
+
+        let _ = client.tick_size(token_id_u256).await?;
+        let _ = client.fee_rate_bps(token_id_u256).await?;
+        info!(
+            "Warmed order cache for token {}",
+            &token_id[..token_id.len().min(20)]
+        );
         Ok(())
     }
 
@@ -209,7 +242,7 @@ impl PolymarketApi {
 
     /// Place a Fill-or-Kill buy order. Returns Ok(Some(response)) if filled, Ok(None) if not fillable.
     pub async fn place_fok_buy(&self, token_id: &str, size: &str, price: &str) -> Result<Option<OrderResponse>> {
-        let (signer, client) = self.build_clob_client().await?;
+        let (signer, client) = self.get_clob_client()?;
 
         let price_dec = rust_decimal::Decimal::from_str(price)
             .context(format!("Failed to parse price: {}", price))?;
@@ -230,7 +263,7 @@ impl PolymarketApi {
             .side(Side::Buy)
             .order_type(OrderType::FOK);
 
-        let signed_order = client.sign(&signer, order_builder.build().await?)
+        let signed_order = client.sign(signer, order_builder.build().await?)
             .await
             .context("Failed to sign FOK order")?;
 
@@ -586,6 +619,7 @@ impl PolymarketApi {
     /// Fetch latest price from a Chainlink aggregator via eth_call (latestRoundData).
     /// Tries each configured RPC URL in order until one succeeds.
     /// Returns (price_usd, updated_at_unix_secs).
+    #[allow(dead_code)]
     pub async fn get_chainlink_price_rpc(
         &self,
         symbol: &str,
@@ -623,6 +657,7 @@ impl PolymarketApi {
         Err(last_err)
     }
 
+    #[allow(dead_code)]
     async fn try_chainlink_rpc(
         &self,
         rpc_url: &str,
@@ -675,6 +710,7 @@ impl PolymarketApi {
 }
 
 /// Chainlink aggregator proxy addresses on Polygon mainnet (8 decimals).
+#[allow(dead_code)]
 fn chainlink_aggregator_address(symbol: &str) -> Option<&'static str> {
     match symbol.to_lowercase().as_str() {
         "btc" => Some("0xc907E116054Ad103354f2D350FD2514433D57F6f"),

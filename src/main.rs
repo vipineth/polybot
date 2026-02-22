@@ -4,6 +4,7 @@ mod config;
 mod discovery;
 mod log_buffer;
 mod models;
+mod orderbook_ws;
 mod paper_trade;
 mod rtds;
 mod strategy;
@@ -21,6 +22,10 @@ use strategy::ArbStrategy;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    rustls::crypto::ring::default_provider()
+        .install_default()
+        .expect("Failed to install rustls crypto provider");
+
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Info)
         .format(|buf, record| writeln!(buf, "{}", record.args()))

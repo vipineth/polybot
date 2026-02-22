@@ -41,9 +41,6 @@ pub struct StrategyConfig {
     /// Seconds to sweep before giving up.
     #[serde(default = "default_sweep_timeout_secs")]
     pub sweep_timeout_secs: u64,
-    /// Size per FOK buy order (shares).
-    #[serde(default = "default_sweep_order_size")]
-    pub sweep_order_size: String,
     /// Milliseconds between FOK orders.
     #[serde(default = "default_sweep_inter_order_delay_ms")]
     pub sweep_inter_order_delay_ms: u64,
@@ -67,9 +64,6 @@ fn default_sweep_min_price() -> f64 {
 }
 fn default_sweep_timeout_secs() -> u64 {
     30
-}
-fn default_sweep_order_size() -> String {
-    "100".to_string()
 }
 fn default_sweep_inter_order_delay_ms() -> u64 {
     50
@@ -134,7 +128,6 @@ impl Default for Config {
                 sweep_max_price: default_sweep_max_price(),
                 sweep_min_price: default_sweep_min_price(),
                 sweep_timeout_secs: default_sweep_timeout_secs(),
-                sweep_order_size: default_sweep_order_size(),
                 sweep_inter_order_delay_ms: default_sweep_inter_order_delay_ms(),
                 sweep_min_margin_pct: default_sweep_min_margin_pct(),
                 max_sweep_cost: default_max_sweep_cost(),

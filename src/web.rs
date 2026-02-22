@@ -23,10 +23,17 @@ pub async fn spawn_dashboard(log_buffer: LogBuffer) {
         .route("/snapshot", get(snapshot_handler))
         .with_state(log_buffer);
 
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port))
-        .await
-        .expect("failed to bind dashboard port");
-    info!("Dashboard running on http://0.0.0.0:{}", port);
+    let listener = match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await {
+        Ok(l) => l,
+        Err(e) => {
+            log::warn!("Dashboard port {} unavailable ({}), trying {}", port, e, port + 1);
+            tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port + 1))
+                .await
+                .expect("failed to bind dashboard on fallback port too")
+        }
+    };
+    let actual_port = listener.local_addr().map(|a| a.port()).unwrap_or(port);
+    info!("Dashboard running on http://0.0.0.0:{}", actual_port);
     tokio::spawn(async move {
         axum::serve(listener, app).await.ok();
     });

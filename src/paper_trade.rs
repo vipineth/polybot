@@ -5,9 +5,10 @@ use crate::api::PolymarketApi;
 use crate::config::StrategyConfig;
 use crate::discovery::format_5m_period_et;
 use crate::log_buffer::LogBuffer;
+use crate::orderbook_ws::OrderbookMirror;
 use crate::rtds::LatestPriceCache;
 use chrono::Utc;
-use log::error;
+use log::{error, info};
 use std::fmt::Write as FmtWrite;
 use std::io::Write as IoWrite;
 use std::sync::Arc;
@@ -18,15 +19,43 @@ use tokio::sync::Mutex;
 pub struct PaperTradeLogger {
     api: Arc<PolymarketApi>,
     latest_prices: LatestPriceCache,
+    orderbook_mirror: Arc<OrderbookMirror>,
     file_mutex: Arc<Mutex<()>>,
     log_buffer: LogBuffer,
 }
 
 impl PaperTradeLogger {
-    pub fn new(api: Arc<PolymarketApi>, latest_prices: LatestPriceCache, log_buffer: LogBuffer) -> Self {
+    pub fn new(
+        api: Arc<PolymarketApi>,
+        latest_prices: LatestPriceCache,
+        orderbook_mirror: Arc<OrderbookMirror>,
+        log_buffer: LogBuffer,
+    ) -> Self {
+        // Create/touch paper_trade.md immediately so it exists from startup
+        match std::fs::OpenOptions::new()
+            .append(true)
+            .create(true)
+            .open("paper_trade.md")
+        {
+            Ok(mut f) => {
+                // Write header only if the file is empty (newly created)
+                if f.metadata().map(|m| m.len() == 0).unwrap_or(false) {
+                    let header = format!(
+                        "# Paper Trade Log\n\nStarted: {}\n\n---\n\n",
+                        Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
+                    );
+                    let _ = f.write_all(header.as_bytes());
+                }
+                info!("paper_trade.md ready");
+            }
+            Err(e) => {
+                error!("Failed to create paper_trade.md on startup: {}", e);
+            }
+        }
         Self {
             api,
             latest_prices,
+            orderbook_mirror,
             file_mutex: Arc::new(Mutex::new(())),
             log_buffer,
         }
@@ -44,48 +73,22 @@ impl PaperTradeLogger {
         m5_up: &str,
         m5_down: &str,
     ) {
+        info!("Paper trade logging: {} period={} ptb=${}", symbol, period_5, price_to_beat);
         let now_ms = Utc::now().timestamp_millis();
         let period_str = format_5m_period_et(period_5);
 
-        // --- Source 1: RTDS WS (cached from Polymarket WebSocket) ---
-        let rtds_start = std::time::Instant::now();
+        // --- RTDS WS (cached from Polymarket WebSocket) ---
         let rtds_result = {
             let cache = self.latest_prices.read().await;
             cache.get(symbol).copied()
         };
-        let rtds_elapsed = rtds_start.elapsed();
 
-        let (rtds_price, rtds_age_s, rtds_line) = match rtds_result {
+        let (latest_price_opt, age_s) = match rtds_result {
             Some((p, ts)) => {
                 let age = (now_ms - ts) / 1000;
-                let line = format!(
-                    "- **RTDS WS**: ${} (age={}s, {:.1}ms)",
-                    p,
-                    age,
-                    rtds_elapsed.as_secs_f64() * 1000.0
-                );
-                (Some(p), age, line)
+                (Some(p), age)
             }
-            None => (None, i64::MAX, "- **RTDS WS**: unavailable".to_string()),
-        };
-
-        // --- Source 2: Chainlink RPC (on-chain eth_call) ---
-        let rpc_start = std::time::Instant::now();
-        let rpc_result = self.api.get_chainlink_price_rpc(symbol).await;
-        let rpc_elapsed = rpc_start.elapsed();
-
-        let (rpc_price, rpc_age_s, rpc_line) = match &rpc_result {
-            Ok((p, updated_at)) => {
-                let age = (now_ms / 1000) as i64 - (*updated_at as i64);
-                let line = format!(
-                    "- **Chainlink RPC**: ${} (age={}s, {:.0}ms)",
-                    p,
-                    age,
-                    rpc_elapsed.as_secs_f64() * 1000.0
-                );
-                (Some(*p), age, line)
-            }
-            Err(_) => (None, i64::MAX, "- **Chainlink RPC**: unavailable".to_string()),
+            None => (None, i64::MAX),
         };
 
         // Build the markdown entry
@@ -97,53 +100,13 @@ impl PaperTradeLogger {
             period_str
         );
         let _ = writeln!(md, "- **Price-to-beat**: ${}", price_to_beat);
-        let _ = writeln!(md, "{}", rtds_line);
-        let _ = writeln!(md, "{}", rpc_line);
-
-        // Speed comparison when both sources available
-        let rtds_ms = rtds_elapsed.as_secs_f64() * 1000.0;
-        let rpc_ms = rpc_elapsed.as_secs_f64() * 1000.0;
-        if let (Some(rp), Some(cp)) = (rtds_price, rpc_price) {
-            let price_diff = (rp - cp).abs();
-            let faster = if rtds_ms < rpc_ms { "RTDS WS" } else { "Chainlink RPC" };
-            let speed_diff = (rtds_ms - rpc_ms).abs();
-            let fresher = if rtds_age_s < rpc_age_s {
-                "RTDS WS"
-            } else if rpc_age_s < rtds_age_s {
-                "Chainlink RPC"
-            } else {
-                "tied"
-            };
-            let _ = writeln!(
-                md,
-                "- **Speed**: {} faster by {:.0}ms (RTDS WS {:.1}ms vs RPC {:.0}ms) | fresher: {} | price diff: ${}",
-                faster, speed_diff, rtds_ms, rpc_ms, fresher, price_diff
-            );
+        match latest_price_opt {
+            Some(p) => { let _ = writeln!(md, "- **RTDS WS**: ${} (age={}s)", p, age_s); }
+            None => { let _ = writeln!(md, "- **RTDS WS**: unavailable"); }
         }
 
-        // Pick best available price (freshest)
-        let (best, best_age_s) = match (rtds_price, rpc_price) {
-            (Some(rp), Some(cp)) => {
-                if rtds_age_s <= rpc_age_s {
-                    let _ = writeln!(md, "- **Best source**: RTDS WS");
-                    (Some(rp), rtds_age_s)
-                } else {
-                    let _ = writeln!(md, "- **Best source**: Chainlink RPC");
-                    (Some(cp), rpc_age_s)
-                }
-            }
-            (Some(rp), None) => {
-                let _ = writeln!(md, "- **Best source**: RTDS");
-                (Some(rp), rtds_age_s)
-            }
-            (None, Some(cp)) => {
-                let _ = writeln!(md, "- **Best source**: Chainlink RPC");
-                (Some(cp), rpc_age_s)
-            }
-            (None, None) => (None, i64::MAX),
-        };
-
-        let latest_price = match best {
+        let best_age_s = age_s;
+        let latest_price = match latest_price_opt {
             Some(p) => p,
             None => {
                 let _ = writeln!(md, "- **NO CLOSE PRICE** - cannot determine winner\n");
@@ -207,10 +170,16 @@ impl PaperTradeLogger {
             diff.abs(),
         );
 
-        // Fetch orderbook for winning token
-        match self.api.get_orderbook(winning_token).await {
+        // Fetch orderbook for winning token (WS mirror first, REST fallback)
+        let (orderbook_result, ob_source) =
+            if let Some(ob) = self.orderbook_mirror.get_orderbook(winning_token).await {
+                (Ok(ob), "WS mirror")
+            } else {
+                (self.api.get_orderbook(winning_token).await, "REST")
+            };
+        match orderbook_result {
             Ok(orderbook) => {
-                let _ = writeln!(md, "### Winning token orderbook ({})", winner);
+                let _ = writeln!(md, "### Winning token orderbook ({}) [source: {}]", winner, ob_source);
                 let _ = writeln!(md, "| Price | Size | USD Value |");
                 let _ = writeln!(md, "|-------|------|-----------|");
 
@@ -317,6 +286,8 @@ impl PaperTradeLogger {
             Ok(mut f) => {
                 if let Err(e) = f.write_all(content.as_bytes()) {
                     error!("Failed to write paper_trade.md: {}", e);
+                } else {
+                    info!("paper_trade.md updated ({} bytes)", content.len());
                 }
             }
             Err(e) => {

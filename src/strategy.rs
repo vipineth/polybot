@@ -6,6 +6,7 @@ use crate::chainlink::run_chainlink_multi_poller;
 use crate::config::Config;
 use crate::discovery::{current_5m_period_start, MarketDiscovery, MARKET_5M_DURATION_SECS};
 use crate::log_buffer::LogBuffer;
+use crate::orderbook_ws::OrderbookMirror;
 use crate::paper_trade::PaperTradeLogger;
 use crate::rtds::{LatestPriceCache, PriceCacheMulti};
 use anyhow::Result;
@@ -28,12 +29,15 @@ pub struct ArbStrategy {
     paper_trader: PaperTradeLogger,
     /// Web dashboard log buffer.
     log_buffer: LogBuffer,
+    /// WebSocket orderbook mirror (shared across symbol loops).
+    orderbook_mirror: Arc<OrderbookMirror>,
 }
 
 impl ArbStrategy {
     pub fn new(api: Arc<PolymarketApi>, config: Config, log_buffer: LogBuffer) -> Self {
         let latest_prices: LatestPriceCache = Arc::new(RwLock::new(HashMap::new()));
-        let paper_trader = PaperTradeLogger::new(api.clone(), Arc::clone(&latest_prices), log_buffer.clone());
+        let orderbook_mirror = Arc::new(OrderbookMirror::new());
+        let paper_trader = PaperTradeLogger::new(api.clone(), Arc::clone(&latest_prices), Arc::clone(&orderbook_mirror), log_buffer.clone());
         Self {
             discovery: MarketDiscovery::new(api.clone()),
             api,
@@ -42,6 +46,7 @@ impl ArbStrategy {
             latest_prices,
             paper_trader,
             log_buffer,
+            orderbook_mirror,
         }
     }
 
@@ -61,31 +66,25 @@ impl ArbStrategy {
                     continue;
                 }
             };
-            // Price-to-beat: the on-chain Chainlink price at the start of this period.
-            // 1. RTDS WS capture (exact period-start price, only works for BTC)
-            // 2. Chainlink RPC (on-chain eth_call, works for all symbols)
-            let rtds_capture = {
+            // Price-to-beat: RTDS WS Chainlink capture at period start.
+            let price_to_beat = {
                 let cache = self.price_cache_5.read().await;
                 cache.get(symbol).and_then(|per_period| per_period.get(&period_5).copied())
             };
-            let (price_to_beat, source) = if let Some(p) = rtds_capture {
-                (p, "RTDS WS")
-            } else {
-                match self.api.get_chainlink_price_rpc(symbol).await {
-                    Ok((p, _)) => (p, "Chainlink RPC"),
-                    Err(e) => {
-                        warn!("{} no price-to-beat: RTDS empty, Chainlink RPC failed: {}", symbol, e);
-                        let remaining = (period_5 + MARKET_5M_DURATION_SECS) - Utc::now().timestamp();
-                        if remaining > 0 {
-                            sleep(Duration::from_secs(remaining as u64)).await;
-                        }
-                        continue;
+            let price_to_beat = match price_to_beat {
+                Some(p) => p,
+                None => {
+                    warn!("{} no price-to-beat from RTDS WS for period {}, waiting...", symbol, period_5);
+                    let remaining = (period_5 + MARKET_5M_DURATION_SECS) - Utc::now().timestamp();
+                    if remaining > 0 {
+                        sleep(Duration::from_secs(remaining as u64)).await;
                     }
+                    continue;
                 }
             };
             let (m5_up, m5_down) = self.discovery.get_market_tokens(&m5_cid).await?;
-            info!("{} period={} price-to-beat=${} ({})", symbol, period_5, price_to_beat, source);
-            self.log_buffer.push(symbol, "info", format!("period={} price-to-beat=${} ({})", period_5, price_to_beat, source)).await;
+            info!("{} period={} price-to-beat=${} (RTDS WS)", symbol, period_5, price_to_beat);
+            self.log_buffer.push(symbol, "info", format!("period={} price-to-beat=${} (RTDS WS)", period_5, price_to_beat)).await;
             return Ok((m5_cid, m5_up, m5_down, period_5, price_to_beat));
         }
     }
@@ -106,7 +105,7 @@ impl ArbStrategy {
         Ok(())
     }
 
-    /// Post-close sweep: determine winner from latest price (RTDS + Chainlink RPC),
+    /// Post-close sweep: determine winner from latest RTDS WS price,
     /// then buy winning tokens from stale limit orders using FOK orders.
     /// Returns (total_orders, total_shares, total_cost).
     async fn sweep_stale_asks(
@@ -119,76 +118,23 @@ impl ArbStrategy {
         let cfg = &self.config.strategy;
         let now_ms = Utc::now().timestamp_millis();
 
-        // --- Source 1: RTDS WS (cached from WebSocket) ---
-        let rtds_start = std::time::Instant::now();
+        // --- RTDS WS (cached from WebSocket) ---
         let rtds_result = {
             let cache = self.latest_prices.read().await;
             cache.get(symbol).copied()
         };
-        let rtds_elapsed = rtds_start.elapsed();
 
-        let (rtds_price, rtds_age_s) = match rtds_result {
+        let (latest_price, age_secs) = match rtds_result {
             Some((p, ts)) => {
                 let age = (now_ms - ts) / 1000;
-                info!(
-                    "Sweep {} RTDS WS: ${} (age={}s, {:.1}ms)",
-                    symbol, p, age, rtds_elapsed.as_secs_f64() * 1000.0
-                );
-                (Some(p), age)
+                info!("Sweep {} RTDS WS: ${} (age={}s)", symbol, p, age);
+                (p, age)
             }
             None => {
-                info!(
-                    "Sweep {} RTDS WS: unavailable",
-                    symbol
-                );
-                (None, i64::MAX)
-            }
-        };
-
-        // --- Source 2: Chainlink RPC (on-chain eth_call) ---
-        let rpc_start = std::time::Instant::now();
-        let rpc_result = self.api.get_chainlink_price_rpc(symbol).await;
-        let rpc_elapsed = rpc_start.elapsed();
-
-        let (rpc_price, rpc_age_s) = match &rpc_result {
-            Ok((p, updated_at)) => {
-                let age = (now_ms / 1000) as i64 - (*updated_at as i64);
-                info!(
-                    "Sweep {} Chainlink RPC: ${} (age={}s, {:.0}ms)",
-                    symbol, p, age, rpc_elapsed.as_secs_f64() * 1000.0
-                );
-                (Some(*p), age)
-            }
-            Err(e) => {
-                warn!(
-                    "Sweep {} Chainlink RPC: failed ({}, {:.0}ms)",
-                    symbol, e, rpc_elapsed.as_secs_f64() * 1000.0
-                );
-                (None, i64::MAX)
-            }
-        };
-
-        // --- Pick the best (freshest) available price ---
-        let (latest_price, source, age_secs) = match (rtds_price, rpc_price) {
-            (Some(rp), Some(cp)) => {
-                if rtds_age_s <= rpc_age_s {
-                    (rp, "RTDS WS", rtds_age_s)
-                } else {
-                    (cp, "Chainlink RPC", rpc_age_s)
-                }
-            }
-            (Some(rp), None) => (rp, "RTDS WS", rtds_age_s),
-            (None, Some(cp)) => (cp, "Chainlink RPC", rpc_age_s),
-            (None, None) => {
-                warn!("Sweep {}: no price from RTDS WS or Chainlink RPC, skipping.", symbol);
+                warn!("Sweep {}: no RTDS WS price available, skipping.", symbol);
                 return Ok((0, 0.0, 0.0));
             }
         };
-
-        info!(
-            "Sweep {} using {} price: ${} (age={}s)",
-            symbol, source, latest_price, age_secs
-        );
 
         // Price sanity validation
         if latest_price.is_nan() || latest_price.is_infinite() || latest_price <= 0.0
@@ -224,18 +170,6 @@ impl ArbStrategy {
         if diff == 0.0 {
             info!("Sweep {}: diff=0 (tied prices), skipping.", symbol);
             return Ok((0, 0.0, 0.0));
-        }
-
-        // Cross-validate RTDS vs RPC prices when both available
-        if let (Some(rp), Some(cp)) = (rtds_price, rpc_price) {
-            let source_disagreement = (rp - cp).abs();
-            if source_disagreement > diff.abs() {
-                warn!(
-                    "Sweep {}: source disagreement (${}) > price movement (${}), skipping. RTDS=${}, RPC=${}",
-                    symbol, source_disagreement, diff.abs(), rp, cp
-                );
-                return Ok((0, 0.0, 0.0));
-            }
         }
 
         // Check minimum margin (percentage of price_to_beat)
@@ -283,12 +217,16 @@ impl ArbStrategy {
                 break;
             }
 
-            // a. Fetch orderbook for winning token
-            let orderbook = match self.api.get_orderbook(winning_token).await {
-                Ok(ob) => ob,
-                Err(e) => {
-                    warn!("Sweep {}: orderbook fetch failed: {}", symbol, e);
-                    break;
+            // a. Read orderbook from WS mirror (instant), fall back to REST
+            let orderbook = if let Some(ob) = self.orderbook_mirror.get_orderbook(winning_token).await {
+                ob
+            } else {
+                match self.api.get_orderbook(winning_token).await {
+                    Ok(ob) => ob,
+                    Err(e) => {
+                        warn!("Sweep {}: orderbook fetch failed: {}", symbol, e);
+                        break;
+                    }
                 }
             };
 
@@ -311,8 +249,8 @@ impl ArbStrategy {
                     info!("Sweep {}: {} consecutive empty passes, stopping.", symbol, consecutive_empty_passes);
                     break;
                 }
-                info!("Sweep {}: no eligible asks, empty pass {}/3, retrying in 500ms...", symbol, consecutive_empty_passes);
-                sleep(Duration::from_millis(500)).await;
+                info!("Sweep {}: no eligible asks, empty pass {}/3, waiting for WS update...", symbol, consecutive_empty_passes);
+                self.orderbook_mirror.wait_for_update(Duration::from_secs(3)).await;
                 continue;
             }
 
@@ -328,7 +266,24 @@ impl ArbStrategy {
                 }
 
                 let price_str = format!("{}", ask.price);
-                let size_str = cfg.sweep_order_size.clone();
+                let ask_price: f64 = price_str.parse().unwrap_or(1.0);
+                let ask_size: f64 = ask.size.to_string().parse().unwrap_or(0.0);
+
+                // Dynamic sizing: match the ask size, capped by remaining budget
+                let remaining_budget = cfg.max_sweep_cost - total_cost;
+                let max_affordable = if ask_price > 0.0 {
+                    remaining_budget / ask_price
+                } else {
+                    0.0
+                };
+                let order_size = ask_size.min(max_affordable);
+                // Round down to 2 decimal places (SDK LOT_SIZE_SCALE)
+                let order_size = (order_size * 100.0).floor() / 100.0;
+                if order_size < 0.01 {
+                    info!("Sweep {}: order_size too small ({:.2}), skipping ask @ {}", symbol, order_size, price_str);
+                    continue;
+                }
+                let size_str = format!("{:.2}", order_size);
 
                 info!(
                     "Sweep {}: FOK BUY {} @ {} (ask size={})",
@@ -338,17 +293,15 @@ impl ArbStrategy {
                 match self.api.place_fok_buy(winning_token, &size_str, &price_str).await {
                     Ok(Some(resp)) => {
                         total_orders += 1;
-                        let shares: f64 = size_str.parse().unwrap_or(0.0);
-                        let price: f64 = price_str.parse().unwrap_or(0.0);
-                        total_shares += shares;
-                        total_cost += shares * price;
+                        total_shares += order_size;
+                        total_cost += order_size * ask_price;
                         filled_any = true;
                         info!(
                             "Sweep {}: FILLED order #{} (id={}) +{} shares @ {} (total_cost=${})",
                             symbol,
                             total_orders,
                             resp.order_id.as_deref().unwrap_or("?"),
-                            shares,
+                            order_size,
                             price_str,
                             total_cost
                         );
@@ -375,8 +328,8 @@ impl ArbStrategy {
                     info!("Sweep {}: {} consecutive empty passes, stopping.", symbol, consecutive_empty_passes);
                     break;
                 }
-                info!("Sweep {}: no fills this pass ({}/3), retrying in 500ms...", symbol, consecutive_empty_passes);
-                sleep(Duration::from_millis(500)).await;
+                info!("Sweep {}: no fills this pass ({}/3), waiting for WS update...", symbol, consecutive_empty_passes);
+                self.orderbook_mirror.wait_for_update(Duration::from_secs(3)).await;
             }
 
             // e. Re-fetch orderbook and repeat
@@ -438,6 +391,7 @@ impl ArbStrategy {
         latest_prices: LatestPriceCache,
         paper_trader: PaperTradeLogger,
         log_buffer: LogBuffer,
+        orderbook_mirror: Arc<OrderbookMirror>,
         symbol: String,
     ) -> Result<()> {
         let discovery = MarketDiscovery::new(api.clone());
@@ -449,10 +403,23 @@ impl ArbStrategy {
             latest_prices,
             paper_trader,
             log_buffer,
+            orderbook_mirror,
         };
         loop {
             let (m5_cid, m5_up, m5_down, period_5, price_to_beat) =
                 strategy.wait_for_5m_market_and_price(&symbol).await?;
+
+            // Subscribe to WS orderbook for both tokens (~5min of data before sweep)
+            if let Err(e) = strategy.orderbook_mirror.subscribe(&[&m5_up, &m5_down]) {
+                warn!("{} WS orderbook subscribe failed: {}", symbol, e);
+            }
+
+            // Pre-warm SDK order cache (fee_rate_bps + tick_size) for both tokens
+            for token in [&m5_up, &m5_down] {
+                if let Err(e) = strategy.api.warm_order_cache(token).await {
+                    warn!("{} cache warm failed for {}: {}", symbol, &token[..token.len().min(20)], e);
+                }
+            }
 
             if let Err(e) = strategy
                 .run_5m_round(&symbol, period_5)
@@ -476,6 +443,9 @@ impl ArbStrategy {
                     error!("Sweep {} error: {}", symbol, e);
                 }
             }
+
+            // Clean up WS subscriptions for this period
+            strategy.orderbook_mirror.unsubscribe_all().await;
 
             let _ = strategy.poll_until_5m_resolved(&symbol, &m5_cid).await;
             sleep(Duration::from_secs(5)).await;
@@ -506,8 +476,9 @@ impl ArbStrategy {
             let latest_prices = Arc::clone(&self.latest_prices);
             let paper_trader = self.paper_trader.clone();
             let log_buffer = self.log_buffer.clone();
+            let orderbook_mirror = Arc::clone(&self.orderbook_mirror);
             handles.push(tokio::spawn(async move {
-                if let Err(e) = Self::run_symbol_loop(api, config, price_cache_5, latest_prices, paper_trader, log_buffer, symbol.clone()).await {
+                if let Err(e) = Self::run_symbol_loop(api, config, price_cache_5, latest_prices, paper_trader, log_buffer, orderbook_mirror, symbol.clone()).await {
                     error!("Symbol loop {} failed: {}", symbol, e);
                 }
             }));
