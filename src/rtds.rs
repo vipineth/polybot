@@ -6,7 +6,7 @@
 use crate::discovery::period_start_et_unix_for_timestamp;
 use anyhow::{Context, Result};
 use futures_util::{SinkExt, StreamExt};
-use log::{info, warn};
+use log::{debug, info, warn};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -86,7 +86,7 @@ pub async fn run_rtds_chainlink_all(
     let url = ws_url.trim_end_matches('/');
     let symbol_set: std::collections::HashSet<String> =
         symbols.iter().map(|s| s.to_lowercase()).collect();
-    info!("RTDS WS connecting: {} (symbols: {:?})", url, symbols);
+    debug!("RTDS WS connecting: {} (symbols: {:?})", url, symbols);
 
     let (mut ws_stream, _) = connect_async(url).await.context("RTDS WS connect failed")?;
 
@@ -103,7 +103,7 @@ pub async fn run_rtds_chainlink_all(
         .send(Message::Text(sub.to_string()))
         .await
         .context("RTDS WS subscribe failed")?;
-    info!("RTDS WS subscribed to crypto_prices_chainlink (all symbols)");
+    debug!("RTDS WS subscribed to crypto_prices_chainlink (all symbols)");
 
     let mut ping = interval(Duration::from_secs(PING_INTERVAL_SECS));
     ping.tick().await;
@@ -132,7 +132,7 @@ pub async fn run_rtds_chainlink_all(
                                         let per_symbol = cache.entry(key.clone()).or_default();
                                         if !per_symbol.contains_key(&period_5) {
                                             per_symbol.insert(period_5, p.value);
-                                            info!("RTDS WS price-to-beat 5m {}: period {} -> {} USD (feed_ts={})", key, period_5, p.value, ts_sec);
+                                            info!("PTB captured {}: ${} (period {})", key, p.value, period_5);
                                         }
                                     }
                                 }

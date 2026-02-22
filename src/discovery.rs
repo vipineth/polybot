@@ -2,7 +2,7 @@ use crate::api::PolymarketApi;
 use anyhow::Result;
 use chrono::{TimeZone, Timelike};
 use chrono_tz::America::New_York;
-use log::info;
+
 use std::sync::Arc;
 
 pub const MARKET_5M_DURATION_SECS: i64 = 5 * 60;  // 300
@@ -129,8 +129,8 @@ impl MarketDiscovery {
         Ok((up, down))
     }
 
-    /// Fetch 5m market by symbol and period start; returns condition_id and price-to-beat if parseable.
-    pub async fn get_5m_market(&self, symbol: &str, period_start: i64) -> Result<Option<(String, Option<f64>)>> {
+    /// Fetch 5m market by symbol and period start; returns (condition_id, question).
+    pub async fn get_5m_market(&self, symbol: &str, period_start: i64) -> Result<Option<(String, String)>> {
         let slug = build_5m_slug(symbol, period_start);
         let market = match self.api.get_market_by_slug(&slug).await {
             Ok(m) => m,
@@ -139,10 +139,6 @@ impl MarketDiscovery {
         if !market.active || market.closed {
             return Ok(None);
         }
-        let price_to_beat = parse_price_to_beat_from_question(&market.question);
-        if price_to_beat.is_none() {
-            info!("Could not parse price-to-beat from question: {:?}", market.question);
-        }
-        Ok(Some((market.condition_id, price_to_beat)))
+        Ok(Some((market.condition_id, market.question)))
     }
 }

@@ -5,7 +5,7 @@
 
 use crate::rtds::{run_rtds_chainlink_all, LatestPriceCache, PriceCacheMulti};
 use anyhow::Result;
-use log::warn;
+use log::{debug, warn};
 use std::sync::Arc;
 use tokio::time::Duration;
 
@@ -20,6 +20,7 @@ pub async fn run_chainlink_multi_poller(
     let latest = Arc::clone(&latest_prices);
 
     tokio::spawn(async move {
+        let mut attempts: u32 = 0;
         loop {
             if let Err(e) = run_rtds_chainlink_all(
                 &rtds_ws_url,
@@ -29,7 +30,16 @@ pub async fn run_chainlink_multi_poller(
             )
             .await
             {
-                warn!("RTDS WS stream exited: {} (reconnecting in 5s)", e);
+                attempts += 1;
+                if attempts <= 2 {
+                    warn!("RTDS WS stream exited: {} (reconnecting in 5s)", e);
+                } else {
+                    debug!("RTDS WS reconnect attempt {}: {}", attempts, e);
+                }
+            } else {
+                // Connected successfully then disconnected — reset counter
+                attempts = 0;
+                warn!("RTDS WS connection closed (reconnecting in 5s)");
             }
             tokio::time::sleep(Duration::from_secs(5)).await;
         }

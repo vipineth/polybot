@@ -2,6 +2,8 @@ mod api;
 mod chainlink;
 mod config;
 mod discovery;
+#[allow(dead_code)]
+mod executor;
 mod log_buffer;
 mod models;
 mod orderbook_ws;

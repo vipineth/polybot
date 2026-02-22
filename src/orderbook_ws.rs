@@ -2,11 +2,12 @@ use crate::models::{OrderBook, OrderBookEntry};
 use anyhow::{Context, Result};
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::sync::atomic::{AtomicU64, Ordering};
 use tokio::sync::{Notify, RwLock};
 use tokio::task::JoinHandle;
 use tokio::time::Duration;
 use futures_util::StreamExt;
-use log::{info, warn};
+use log::{debug, warn};
 use alloy::primitives::U256;
 use polymarket_client_sdk::clob::ws::Client as WsClient;
 
@@ -14,6 +15,8 @@ pub struct OrderbookMirror {
     books: Arc<RwLock<HashMap<String, OrderBook>>>,
     notify: Arc<Notify>,
     active_tasks: std::sync::Mutex<Vec<JoinHandle<()>>>,
+    update_count: Arc<AtomicU64>,
+    subscribe_time: Arc<RwLock<Option<std::time::Instant>>>,
 }
 
 impl OrderbookMirror {
@@ -22,6 +25,8 @@ impl OrderbookMirror {
             books: Arc::new(RwLock::new(HashMap::new())),
             notify: Arc::new(Notify::new()),
             active_tasks: std::sync::Mutex::new(Vec::new()),
+            update_count: Arc::new(AtomicU64::new(0)),
+            subscribe_time: Arc::new(RwLock::new(None)),
         }
     }
 
@@ -36,7 +41,7 @@ impl OrderbookMirror {
 
     /// Subscribe to orderbook updates for the given token IDs via WebSocket.
     /// Spawns a background task that continuously updates the local mirror.
-    pub fn subscribe(&self, token_ids: &[&str]) -> Result<()> {
+    pub async fn subscribe(&self, token_ids: &[&str]) -> Result<()> {
         let asset_ids: Vec<U256> = token_ids
             .iter()
             .map(|id| Self::parse_token_id(id))
@@ -57,14 +62,22 @@ impl OrderbookMirror {
             .subscribe_orderbook(asset_ids)
             .context("Failed to subscribe to orderbook WS")?;
 
+        // Reset tracking for this subscription cycle
+        self.update_count.store(0, Ordering::Relaxed);
+        *self.subscribe_time.write().await = Some(std::time::Instant::now());
+
         let books = Arc::clone(&self.books);
         let notify = Arc::clone(&self.notify);
+        let update_count = Arc::clone(&self.update_count);
+
+        debug!("Orderbook WS subscribed to {} tokens", token_ids.len());
 
         let handle = tokio::spawn(async move {
             let mut stream = Box::pin(stream);
             while let Some(result) = stream.next().await {
                 match result {
                     Ok(book_update) => {
+                        update_count.fetch_add(1, Ordering::Relaxed);
                         let asset_id_str = book_update.asset_id.to_string();
                         let token_id = token_id_map
                             .get(&asset_id_str)
@@ -98,7 +111,7 @@ impl OrderbookMirror {
                             books.insert(token_id.clone(), orderbook);
                         }
 
-                        info!(
+                        debug!(
                             "WS orderbook update: {} ({} bids, {} asks)",
                             &token_id[..token_id.len().min(20)],
                             bid_count,

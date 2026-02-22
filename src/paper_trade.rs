@@ -1,5 +1,5 @@
-//! Paper trade logger: after each 5m round, log what we *would* have traded
-//! to paper_trade.md. Pure observation — no orders placed.
+//! Paper trade logger: after each 5m round, log what we *would* have traded.
+//! Takes two orderbook snapshots: at close and after a post-close monitoring window.
 
 use crate::config::StrategyConfig;
 use crate::discovery::format_5m_period_et;
@@ -7,59 +7,40 @@ use crate::log_buffer::LogBuffer;
 use crate::orderbook_ws::OrderbookMirror;
 use crate::rtds::LatestPriceCache;
 use chrono::Utc;
-use log::{error, info};
+use log::{info, warn};
 use std::fmt::Write as FmtWrite;
-use std::io::Write as IoWrite;
-use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::fs::OpenOptions;
+use tokio::io::AsyncWriteExt;
+use tokio::time::{sleep, Duration};
+
+const PAPER_TRADE_FILE: &str = "paper_trade.md";
+
+/// How long to monitor the orderbook after close (total window).
+const POST_CLOSE_MONITOR_SECS: u64 = 20;
+/// How often to dump the orderbook during post-close monitoring.
+const OB_DUMP_INTERVAL_SECS: u64 = 2;
 
 /// Shared handle for paper trade logging across concurrent symbol loops.
 #[derive(Clone)]
 pub struct PaperTradeLogger {
     latest_prices: LatestPriceCache,
-    orderbook_mirror: Arc<OrderbookMirror>,
-    file_mutex: Arc<Mutex<()>>,
     log_buffer: LogBuffer,
 }
 
 impl PaperTradeLogger {
     pub fn new(
         latest_prices: LatestPriceCache,
-        orderbook_mirror: Arc<OrderbookMirror>,
         log_buffer: LogBuffer,
     ) -> Self {
-        // Create/touch paper_trade.md immediately so it exists from startup
-        match std::fs::OpenOptions::new()
-            .append(true)
-            .create(true)
-            .open("paper_trade.md")
-        {
-            Ok(mut f) => {
-                // Write header only if the file is empty (newly created)
-                if f.metadata().map(|m| m.len() == 0).unwrap_or(false) {
-                    let header = format!(
-                        "# Paper Trade Log\n\nStarted: {}\n\n---\n\n",
-                        Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
-                    );
-                    let _ = f.write_all(header.as_bytes());
-                }
-                info!("paper_trade.md ready");
-            }
-            Err(e) => {
-                error!("Failed to create paper_trade.md on startup: {}", e);
-            }
-        }
         Self {
             latest_prices,
-            orderbook_mirror,
-            file_mutex: Arc::new(Mutex::new(())),
             log_buffer,
         }
     }
 
     /// Log a paper trade entry after a 5m round ends.
-    /// Fetches prices from both sources, determines winner, fetches orderbook,
-    /// and appends a formatted markdown section to paper_trade.md.
+    /// Takes orderbook snapshot at close, waits 10s, takes another snapshot,
+    /// and logs whether any favorable asks appeared in the post-close window.
     pub async fn log(
         &self,
         cfg: &StrategyConfig,
@@ -68,12 +49,13 @@ impl PaperTradeLogger {
         price_to_beat: f64,
         m5_up: &str,
         m5_down: &str,
+        orderbook_mirror: &OrderbookMirror,
     ) {
-        info!("Paper trade logging: {} period={} ptb=${}", symbol, period_5, price_to_beat);
+        info!("Paper trade: {} period={} ptb=${}", symbol, period_5, price_to_beat);
         let now_ms = Utc::now().timestamp_millis();
         let period_str = format_5m_period_et(period_5);
 
-        // --- RTDS WS (cached from Polymarket WebSocket) ---
+        // Get close price from RTDS WS
         let rtds_result = {
             let cache = self.latest_prices.read().await;
             cache.get(symbol).copied()
@@ -87,53 +69,40 @@ impl PaperTradeLogger {
             None => (None, i64::MAX),
         };
 
-        // Build the markdown entry
         let mut md = String::new();
-        let _ = writeln!(
-            md,
-            "## {} | {}\n",
-            symbol.to_uppercase(),
-            period_str
-        );
+        let _ = writeln!(md, "## {} | {}\n", symbol.to_uppercase(), period_str);
         let _ = writeln!(md, "- **Price-to-beat**: ${}", price_to_beat);
         match latest_price_opt {
-            Some(p) => { let _ = writeln!(md, "- **RTDS WS**: ${} (age={}s)", p, age_s); }
-            None => { let _ = writeln!(md, "- **RTDS WS**: unavailable"); }
+            Some(p) => { let _ = writeln!(md, "- **Close price (RTDS WS)**: ${} (age={}s)", p, age_s); }
+            None => { let _ = writeln!(md, "- **Close price**: unavailable"); }
         }
 
         let latest_price = match latest_price_opt {
             Some(p) => p,
             None => {
-                let _ = writeln!(md, "- **NO CLOSE PRICE** - cannot determine winner\n");
-                let _ = writeln!(md, "---\n");
-                self.append(&md).await;
-                self.log_buffer.push(symbol, "warn", format!("{} | no close price available", period_str)).await;
+                let _ = writeln!(md, "- **NO CLOSE PRICE** — cannot determine winner\n---\n");
+                self.log_entry(symbol, &md).await;
+                self.log_buffer.push(symbol, "warn", format!("{} | no close price", period_str)).await;
                 return;
             }
         };
 
-        // Determine winner
         let diff = latest_price - price_to_beat;
 
-        // Zero diff (tied prices)
         if diff == 0.0 {
-            let _ = writeln!(md, "- **Winner**: NONE (tied) — diff=0, skipping\n");
-            let _ = writeln!(md, "---\n");
-            self.append(&md).await;
-            self.log_buffer.push(symbol, "info", format!("{} | tied (ptb=${}, close=${})", period_str, price_to_beat, latest_price)).await;
+            let _ = writeln!(md, "- **Winner**: NONE (tied) — diff=0\n---\n");
+            self.log_entry(symbol, &md).await;
+            self.log_buffer.push(symbol, "info", format!("{} | tied", period_str)).await;
             return;
         }
 
-        // Minimum margin check (percentage of price_to_beat)
         let min_margin_abs = cfg.sweep_min_margin_pct * price_to_beat;
         if diff.abs() < min_margin_abs {
             let _ = writeln!(
-                md,
-                "- **BELOW MARGIN** — diff ${} < min margin ${} ({}% of ${}), would skip in live mode\n",
-                diff.abs(), min_margin_abs, cfg.sweep_min_margin_pct * 100.0, price_to_beat
+                md, "- **BELOW MARGIN** — diff ${} < min ${} ({}%)\n---\n",
+                diff.abs(), min_margin_abs, cfg.sweep_min_margin_pct * 100.0
             );
-            let _ = writeln!(md, "---\n");
-            self.append(&md).await;
+            self.log_entry(symbol, &md).await;
             self.log_buffer.push(symbol, "info", format!("{} | below margin (diff=${})", period_str, diff.abs())).await;
             return;
         }
@@ -145,20 +114,120 @@ impl PaperTradeLogger {
         };
 
         let _ = writeln!(
-            md,
-            "- **Winner**: {} (diff={}{})\n",
-            winner,
-            if diff >= 0.0 { "+$" } else { "-$" },
-            diff.abs(),
+            md, "- **Winner**: {} (diff={}{})\n",
+            winner, if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
         );
 
-        // Fetch orderbook for winning token from WS mirror
-        let orderbook_opt = self.orderbook_mirror.get_orderbook(winning_token).await;
+        // Subscribe to winning token orderbook after determining winner
+        info!("{} subscribing to winning token orderbook...", symbol);
+        if let Err(e) = orderbook_mirror.subscribe(&[winning_token]).await {
+            warn!("{} orderbook subscribe failed: {}", symbol, e);
+        }
+
+        // Dump orderbook every 2s so we can see how it evolves post-close
+        let _ = writeln!(md, "### Winning side ({}) orderbook snapshots", winner);
+        let start = std::time::Instant::now();
+        let mut snapshot_num = 0u32;
+        let mut last_summary = OrderbookSnapshot { md: String::new(), capped_shares: 0.0, avg_price: 0.0, profit: 0.0 };
+        loop {
+            let elapsed = start.elapsed().as_secs();
+            if elapsed >= POST_CLOSE_MONITOR_SECS {
+                break;
+            }
+            // Wait for orderbook data (first iteration) or next update (subsequent)
+            if snapshot_num == 0 {
+                // Give WS a moment to deliver initial snapshot
+                sleep(Duration::from_millis(500)).await;
+            }
+
+            let ob_opt = orderbook_mirror.get_orderbook(winning_token).await;
+            if let Some(ref ob) = ob_opt {
+                // Only dump if there are sweepable asks (price <= sweep_max_price)
+                let sweepable_asks: Vec<_> = {
+                    let mut sorted = ob.asks.clone();
+                    sorted.retain(|a| {
+                        let p: f64 = a.price.to_string().parse().unwrap_or(1.0);
+                        p <= cfg.sweep_max_price
+                    });
+                    sorted.sort_by(|a, b| a.price.cmp(&b.price));
+                    sorted
+                };
+
+                if sweepable_asks.is_empty() {
+                    continue;
+                }
+
+                snapshot_num += 1;
+                let elapsed_s = start.elapsed().as_secs();
+                let ts = Utc::now().format("%H:%M:%S");
+                let asks_summary: Vec<String> = sweepable_asks.iter()
+                    .take(5)
+                    .map(|a| format!("{}x{}", a.price, a.size))
+                    .collect();
+                info!(
+                    "[OB {} {} T+{}s {}] asks: {}",
+                    symbol, winner, elapsed_s, ts,
+                    asks_summary.join(", "),
+                );
+
+                // Detailed snapshot for paper_trade.md
+                let _ = writeln!(md, "\n**T+{}s ({}) snapshot #{}:**", elapsed_s, ts, snapshot_num);
+                last_summary = self.snapshot_orderbook(cfg, winning_token, winner, orderbook_mirror).await;
+                let _ = write!(md, "{}", last_summary.md);
+            }
+
+            sleep(Duration::from_secs(OB_DUMP_INTERVAL_SECS)).await;
+        }
+
+        let post_summary = last_summary;
+
+        // === Verdict ===
+        let favorable = post_summary.capped_shares > 0.0;
+        if favorable {
+            let _ = writeln!(
+                md, "**FAVORABLE** — {:.2} sweepable shares found post-close (avg {:.4}, P&L ${:.2})\n",
+                post_summary.capped_shares, post_summary.avg_price, post_summary.profit
+            );
+        } else {
+            let _ = writeln!(md, "**NO FAVORABLE ASKS** found in post-close window\n");
+        }
+        let _ = writeln!(md, "---\n");
+
+        self.log_entry(symbol, &md).await;
+
+        // Log buffer summary
+        let summary = if favorable {
+            format!(
+                "{} | {} ptb=${} close=${} diff={}{} | post-close: {:.2}sh @ {:.4} -> P&L ${:.2}",
+                period_str, winner, price_to_beat, latest_price,
+                if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
+                post_summary.capped_shares, post_summary.avg_price, post_summary.profit
+            )
+        } else {
+            format!(
+                "{} | {} ptb=${} close=${} diff={}{} | no favorable asks post-close",
+                period_str, winner, price_to_beat, latest_price,
+                if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
+            )
+        };
+        self.log_buffer.push(symbol, "info", summary).await;
+    }
+
+    /// Take a snapshot of the winning token's orderbook and return formatted summary.
+    async fn snapshot_orderbook(
+        &self,
+        cfg: &StrategyConfig,
+        winning_token: &str,
+        _winner: &str,
+        orderbook_mirror: &OrderbookMirror,
+    ) -> OrderbookSnapshot {
+        let orderbook_opt = orderbook_mirror.get_orderbook(winning_token).await;
+        let mut md = String::new();
+
         match orderbook_opt {
             Some(orderbook) => {
-                let _ = writeln!(md, "### Winning token orderbook ({})", winner);
-                let _ = writeln!(md, "| Price | Size | USD Value |");
-                let _ = writeln!(md, "|-------|------|-----------|");
+                let _ = writeln!(md, "| Price | Size | USD |");
+                let _ = writeln!(md, "|-------|------|-----|");
 
                 let mut sweepable_levels = 0u32;
                 let mut sweepable_shares = 0.0f64;
@@ -167,7 +236,6 @@ impl PaperTradeLogger {
                 let mut capped_shares = 0.0f64;
                 let mut capped_levels = 0u32;
 
-                // Sort asks descending (most expensive first) to match sweep order
                 let mut sorted_asks = orderbook.asks.clone();
                 sorted_asks.sort_by(|a, b| b.price.cmp(&a.price));
 
@@ -177,13 +245,12 @@ impl PaperTradeLogger {
                     let usd = p * s;
                     let in_range = p <= cfg.sweep_max_price;
                     let marker = if in_range && capped_cost < cfg.max_sweep_cost { " *" } else { "" };
-                    let _ = writeln!(md, "| {}  | {}  | ${}  |{}", p, s, usd, marker);
+                    let _ = writeln!(md, "| {} | {} | ${:.2} |{}", p, s, usd, marker);
 
                     if in_range {
                         sweepable_levels += 1;
                         sweepable_shares += s;
                         sweepable_cost += usd;
-                        // Track what we'd actually buy within max_sweep_cost budget
                         if capped_cost < cfg.max_sweep_cost {
                             let remaining_budget = cfg.max_sweep_cost - capped_cost;
                             let buyable_usd = usd.min(remaining_budget);
@@ -197,79 +264,60 @@ impl PaperTradeLogger {
 
                 let _ = writeln!(md);
                 let _ = writeln!(
-                    md,
-                    "- **Sweepable asks** (<= {}): {} levels, {} shares, ${} cost",
+                    md, "Sweepable (<= {}): {} levels, {:.2} shares, ${:.2}",
                     cfg.sweep_max_price, sweepable_levels, sweepable_shares, sweepable_cost
                 );
 
+                let avg_price = if capped_shares > 0.0 { capped_cost / capped_shares } else { 0.0 };
+                let profit = if capped_shares > 0.0 { capped_shares * (1.0 - avg_price) } else { 0.0 };
+
                 if capped_shares > 0.0 {
-                    let avg_price = capped_cost / capped_shares;
-                    let profit = capped_shares * (1.0 - avg_price);
                     let _ = writeln!(
-                        md,
-                        "- **Within budget** (${}): {} levels, {:.2} shares, ${:.2} cost, avg {:.4}",
+                        md, "Within budget (${}): {} levels, {:.2} shares, ${:.2} cost, avg {:.4}",
                         cfg.max_sweep_cost, capped_levels, capped_shares, capped_cost, avg_price
                     );
                     let _ = writeln!(
-                        md,
-                        "- **Hypothetical P&L**: buy {:.2} shares @ avg {:.4} -> profit ${:.2}\n",
+                        md, "Hypothetical P&L: {:.2} shares @ {:.4} -> ${:.2}\n",
                         capped_shares, avg_price, profit
                     );
-                    let _ = writeln!(md, "---\n");
-                    self.append(&md).await;
-                    self.log_buffer.push(
-                        symbol,
-                        "info",
-                        format!(
-                            "{} | winner={} ptb=${} close=${} diff={}{} | {:.2} shares @ avg {:.4} -> P&L ${:.2}",
-                            period_str, winner, price_to_beat, latest_price,
-                            if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
-                            capped_shares, avg_price, profit
-                        ),
-                    ).await;
                 } else {
-                    let _ = writeln!(md, "- **Hypothetical P&L**: no sweepable asks\n");
-                    let _ = writeln!(md, "---\n");
-                    self.append(&md).await;
-                    self.log_buffer.push(
-                        symbol,
-                        "info",
-                        format!(
-                            "{} | winner={} ptb=${} close=${} diff={}{} | no sweepable asks",
-                            period_str, winner, price_to_beat, latest_price,
-                            if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
-                        ),
-                    ).await;
+                    let _ = writeln!(md, "No sweepable asks within budget\n");
                 }
+
+                OrderbookSnapshot { md, capped_shares, avg_price, profit }
             }
             None => {
-                let _ = writeln!(md, "### Winning token orderbook ({})\n", winner);
-                let _ = writeln!(md, "- **No orderbook in WS mirror**\n");
-                let _ = writeln!(md, "---\n");
-                self.append(&md).await;
-                self.log_buffer.push(symbol, "info", format!("{} | no orderbook in WS mirror", period_str)).await;
+                let _ = writeln!(md, "No orderbook data in WS mirror\n");
+                OrderbookSnapshot { md, capped_shares: 0.0, avg_price: 0.0, profit: 0.0 }
             }
         }
     }
 
-    /// Append content to paper_trade.md, guarded by mutex.
-    async fn append(&self, content: &str) {
-        let _guard = self.file_mutex.lock().await;
-        match std::fs::OpenOptions::new()
-            .append(true)
+    /// Log entry to both stdout and paper_trade.md file.
+    async fn log_entry(&self, symbol: &str, content: &str) {
+        info!("Paper trade [{}]:\n{}", symbol, content);
+
+        match OpenOptions::new()
             .create(true)
-            .open("paper_trade.md")
+            .append(true)
+            .open(PAPER_TRADE_FILE)
+            .await
         {
-            Ok(mut f) => {
-                if let Err(e) = f.write_all(content.as_bytes()) {
-                    error!("Failed to write paper_trade.md: {}", e);
-                } else {
-                    info!("paper_trade.md updated ({} bytes)", content.len());
+            Ok(mut file) => {
+                if let Err(e) = file.write_all(content.as_bytes()).await {
+                    warn!("Failed to write paper_trade.md: {}", e);
                 }
             }
             Err(e) => {
-                error!("Failed to open paper_trade.md: {}", e);
+                warn!("Failed to open paper_trade.md: {}", e);
             }
         }
     }
+}
+
+struct OrderbookSnapshot {
+    md: String,
+    capped_shares: f64,
+    avg_price: f64,
+    profit: f64,
 }

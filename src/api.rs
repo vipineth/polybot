@@ -137,6 +137,10 @@ impl PolymarketApi {
         Ok(())
     }
 
+    pub fn is_authenticated(&self) -> bool {
+        self.clob_auth.get().is_some()
+    }
+
     /// Get the cached authenticated CLOB client. Errors if `authenticate()` hasn't been called.
     fn get_clob_client(&self) -> Result<&(PrivateKeySigner, ClobClient<Authenticated<Normal>>)> {
         self.clob_auth
