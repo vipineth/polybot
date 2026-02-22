@@ -435,3 +435,21 @@ No sweepable asks within budget
 
 ---
 
+## BTC | February 22, 1:40PM-1:45PM ET
+
+- **Price-to-beat**: $67357.4476371817
+- **Close price (RTDS WS)**: $67356.70572746651 (age=2s)
+- **BELOW MARGIN** — diff $0.741909715186921 < min $6.73574476371817 (0.01%)
+---
+
+## ETH | February 22, 1:40PM-1:45PM ET
+
+- **Price-to-beat**: $1940.79
+- **Close price (RTDS WS)**: $1941.089712 (age=2s)
+- **Winner**: Up (diff=+$0.29971199999999953)
+
+### Winning side (Up) orderbook snapshots
+**NO FAVORABLE ASKS** found in post-close window
+
+---
+

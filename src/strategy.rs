@@ -381,7 +381,7 @@ impl ArbStrategy {
                     .log(
                         &self.config.strategy, &round.symbol, round.period_5,
                         round.price_to_beat, &round.up_token, &round.down_token,
-                        &self.orderbook_mirror,
+                        &round.condition_id, &self.orderbook_mirror,
                     )
                     .await;
 

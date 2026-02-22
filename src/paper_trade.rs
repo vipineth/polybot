@@ -49,6 +49,7 @@ impl PaperTradeLogger {
         price_to_beat: f64,
         m5_up: &str,
         m5_down: &str,
+        condition_id: &str,
         orderbook_mirror: &OrderbookMirror,
     ) {
         info!("Paper trade: {} period={} ptb=${}", symbol, period_5, price_to_beat);
@@ -71,6 +72,7 @@ impl PaperTradeLogger {
 
         let mut md = String::new();
         let _ = writeln!(md, "## {} | {}\n", symbol.to_uppercase(), period_str);
+        let _ = writeln!(md, "- **Condition ID**: `{}`", condition_id);
         let _ = writeln!(md, "- **Price-to-beat**: ${}", price_to_beat);
         match latest_price_opt {
             Some(p) => { let _ = writeln!(md, "- **Close price (RTDS WS)**: ${} (age={}s)", p, age_s); }
@@ -114,9 +116,10 @@ impl PaperTradeLogger {
         };
 
         let _ = writeln!(
-            md, "- **Winner**: {} (diff={}{})\n",
+            md, "- **Winner**: {} (diff={}{})",
             winner, if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
         );
+        let _ = writeln!(md, "- **Winning asset**: `{}`\n", winning_token);
 
         // Subscribe to winning token orderbook after determining winner
         info!("{} subscribing to winning token orderbook...", symbol);
@@ -165,8 +168,10 @@ impl PaperTradeLogger {
                     .map(|a| format!("{}x{}", a.price, a.size))
                     .collect();
                 info!(
-                    "[OB {} {} T+{}s {}] asks: {}",
+                    "[OB {} {} T+{}s {} cid={} asset={}] asks: {}",
                     symbol, winner, elapsed_s, ts,
+                    &condition_id[..condition_id.len().min(12)],
+                    &winning_token[..winning_token.len().min(12)],
                     asks_summary.join(", "),
                 );
 
