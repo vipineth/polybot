@@ -145,14 +145,30 @@ impl Default for Config {
 
 impl Config {
     pub fn load(path: &PathBuf) -> anyhow::Result<Self> {
-        if path.exists() {
+        let mut config = if path.exists() {
             let content = std::fs::read_to_string(path)?;
-            Ok(serde_json::from_str(&content)?)
+            serde_json::from_str(&content)?
         } else {
-            let config = Config::default();
-            let content = serde_json::to_string_pretty(&config)?;
-            std::fs::write(path, content)?;
-            Ok(config)
+            Config::default()
+        };
+
+        // Override from environment variables (for Railway / VPS deployments)
+        if let Ok(v) = std::env::var("PRIVATE_KEY") {
+            config.polymarket.private_key = Some(v);
         }
+        if let Ok(v) = std::env::var("PROXY_WALLET_ADDRESS") {
+            config.polymarket.proxy_wallet_address = Some(v);
+        }
+        if let Ok(v) = std::env::var("SIGNATURE_TYPE") {
+            config.polymarket.signature_type = v.parse().ok();
+        }
+        if let Ok(v) = std::env::var("SIMULATION_MODE") {
+            config.strategy.simulation_mode = v == "true" || v == "1";
+        }
+        if let Ok(v) = std::env::var("SWEEP_ENABLED") {
+            config.strategy.sweep_enabled = v == "true" || v == "1";
+        }
+
+        Ok(config)
     }
 }
