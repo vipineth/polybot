@@ -62,8 +62,8 @@ struct ChainlinkMessage {
 /// Map symbol (e.g. "btc") -> period_start -> price-to-beat.
 pub type PriceCacheMulti = Arc<RwLock<HashMap<String, HashMap<i64, f64>>>>;
 
-/// Latest price per symbol: symbol -> (latest_price_usd, timestamp_ms).
-pub type LatestPriceCache = Arc<RwLock<HashMap<String, (f64, i64)>>>;
+/// Latest price per symbol: symbol -> (latest_price_usd, timestamp_ms, raw_json).
+pub type LatestPriceCache = Arc<RwLock<HashMap<String, (f64, i64, String)>>>;
 
 /// Normalize payload symbol "btc/usd" -> "btc". Returns None if not a known format.
 fn payload_symbol_to_key(s: &str) -> Option<String> {
@@ -122,7 +122,7 @@ pub async fn run_rtds_chainlink_all(
                                         _ => continue,
                                     };
                                     // Always update latest price cache (for post-close sweep)
-                                    latest_prices.write().await.insert(key.clone(), (p.value, p.timestamp));
+                                    latest_prices.write().await.insert(key.clone(), (p.value, p.timestamp, text.clone()));
 
                                     let ts_sec = p.timestamp / 1000;
                                     let period_5 = period_start_et_unix_for_timestamp(ts_sec, 5);

@@ -1,24 +1,34 @@
-//! Paper trade logger: after each 5m round, log what we *would* have traded.
-//! Takes two orderbook snapshots: at close and after a post-close monitoring window.
+//! Paper trade logger: prediction accuracy tracker for 5m rounds.
+//! Logs compact prediction records and resolution results.
 
-use crate::config::StrategyConfig;
-use crate::discovery::format_5m_period_et;
+use crate::discovery::{format_5m_period_et, parse_price_to_beat_from_question};
 use crate::log_buffer::LogBuffer;
-use crate::orderbook_ws::OrderbookMirror;
 use crate::rtds::LatestPriceCache;
 use chrono::Utc;
 use log::{info, warn};
 use std::fmt::Write as FmtWrite;
 use tokio::fs::OpenOptions;
 use tokio::io::AsyncWriteExt;
-use tokio::time::{sleep, Duration};
 
 const PAPER_TRADE_FILE: &str = "paper_trade.md";
+const PREDICTIONS_CSV: &str = "predictions.csv";
 
-/// How long to monitor the orderbook after close (total window).
-const POST_CLOSE_MONITOR_SECS: u64 = 20;
-/// How often to dump the orderbook during post-close monitoring.
-const OB_DUMP_INTERVAL_SECS: u64 = 2;
+/// A single prediction for one symbol in one 5m period.
+pub struct PredictionRecord {
+    pub symbol: String,
+    pub period_5: i64,
+    pub period_str: String,
+    pub price_to_beat: f64,
+    pub close_price: f64,
+    pub prediction: String,
+    pub condition_id: String,
+    pub close_rtds_ts_ms: i64,
+    pub system_read_ts_ms: i64,
+    pub age_s: i64,
+    pub diff: f64,
+    pub diff_pct: f64,
+    pub raw_rtds_json: String,
+}
 
 /// Shared handle for paper trade logging across concurrent symbol loops.
 #[derive(Clone)]
@@ -28,294 +38,177 @@ pub struct PaperTradeLogger {
 }
 
 impl PaperTradeLogger {
-    pub fn new(
-        latest_prices: LatestPriceCache,
-        log_buffer: LogBuffer,
-    ) -> Self {
+    pub fn new(latest_prices: LatestPriceCache, log_buffer: LogBuffer) -> Self {
         Self {
             latest_prices,
             log_buffer,
         }
     }
 
-    /// Log a paper trade entry after a 5m round ends.
-    /// Takes orderbook snapshot at close, waits 10s, takes another snapshot,
-    /// and logs whether any favorable asks appeared in the post-close window.
+    /// Log a prediction after a 5m round closes.
+    /// Returns the prediction record if a close price was available.
     pub async fn log(
         &self,
-        cfg: &StrategyConfig,
         symbol: &str,
         period_5: i64,
         price_to_beat: f64,
-        m5_up: &str,
-        m5_down: &str,
         condition_id: &str,
-        orderbook_mirror: &OrderbookMirror,
-    ) {
+    ) -> Option<PredictionRecord> {
         info!("Paper trade: {} period={} ptb=${}", symbol, period_5, price_to_beat);
-        let now_ms = Utc::now().timestamp_millis();
+        let system_read_ts_ms = Utc::now().timestamp_millis();
         let period_str = format_5m_period_et(period_5);
 
         // Get close price from RTDS WS
         let rtds_result = {
             let cache = self.latest_prices.read().await;
-            cache.get(symbol).copied()
+            cache.get(symbol).cloned()
         };
 
-        let (latest_price_opt, age_s) = match rtds_result {
-            Some((p, ts)) => {
-                let age = (now_ms - ts) / 1000;
-                (Some(p), age)
+        let (close_price, close_rtds_ts_ms, raw_json) = match rtds_result {
+            Some((p, ts, raw)) => (p, ts, raw),
+            None => {
+                let md = format!("## {} | {}\n\n- PTB: ${} | Close: unavailable\n---\n\n", symbol.to_uppercase(), period_str, price_to_beat);
+                self.append_file(PAPER_TRADE_FILE, &md).await;
+                self.log_buffer.push(symbol, "warn", format!("{} | no close price", period_str)).await;
+                return None;
             }
-            None => (None, i64::MAX),
         };
 
+        let age_s = (system_read_ts_ms - close_rtds_ts_ms) / 1000;
+        let diff = close_price - price_to_beat;
+        let diff_pct = if price_to_beat > 0.0 { (diff / price_to_beat).abs() * 100.0 } else { 0.0 };
+        let prediction = if diff > 0.0 { "Up" } else { "Down" };
+
+        let record = PredictionRecord {
+            symbol: symbol.to_string(),
+            period_5,
+            period_str: period_str.clone(),
+            price_to_beat,
+            close_price,
+            prediction: prediction.to_string(),
+            condition_id: condition_id.to_string(),
+            close_rtds_ts_ms,
+            system_read_ts_ms,
+            age_s,
+            diff,
+            diff_pct,
+            raw_rtds_json: raw_json.clone(),
+        };
+
+        // Write compact markdown
         let mut md = String::new();
         let _ = writeln!(md, "## {} | {}\n", symbol.to_uppercase(), period_str);
-        let _ = writeln!(md, "- **Condition ID**: `{}`", condition_id);
-        let _ = writeln!(md, "- **Price-to-beat**: ${}", price_to_beat);
-        match latest_price_opt {
-            Some(p) => { let _ = writeln!(md, "- **Close price (RTDS WS)**: ${} (age={}s)", p, age_s); }
-            None => { let _ = writeln!(md, "- **Close price**: unavailable"); }
-        }
+        let _ = writeln!(md, "- PTB: ${}", price_to_beat);
+        let _ = writeln!(md, "- Close: ${}", close_price);
+        let _ = writeln!(md, "- Prediction: {}", prediction);
+        let _ = writeln!(md, "- Diff: {}${} ({}%)", if diff >= 0.0 { "+" } else { "-" }, diff.abs(), format!("{:.3}", diff_pct));
+        let _ = writeln!(md, "- Close RTDS ts: {}", close_rtds_ts_ms);
+        let _ = writeln!(md, "- System read: {}", system_read_ts_ms);
+        let _ = writeln!(md, "- Age: {}s", age_s);
+        let _ = writeln!(md, "- Raw RTDS: {}", raw_json);
 
-        let latest_price = match latest_price_opt {
-            Some(p) => p,
-            None => {
-                let _ = writeln!(md, "- **NO CLOSE PRICE** — cannot determine winner\n---\n");
-                self.log_entry(symbol, &md).await;
-                self.log_buffer.push(symbol, "warn", format!("{} | no close price", period_str)).await;
-                return;
-            }
-        };
+        self.append_file(PAPER_TRADE_FILE, &md).await;
 
-        let diff = latest_price - price_to_beat;
-
-        let min_margin_abs = cfg.sweep_min_margin_pct * price_to_beat;
-        if diff.abs() < min_margin_abs {
-            let _ = writeln!(
-                md, "- **BELOW MARGIN** — diff ${} < min ${} ({}%)\n---\n",
-                diff.abs(), min_margin_abs, cfg.sweep_min_margin_pct * 100.0
-            );
-            self.log_entry(symbol, &md).await;
-            self.log_buffer.push(symbol, "info", format!("{} | below margin (diff=${})", period_str, diff.abs())).await;
-            return;
-        }
-
-        let (winner, winning_token) = if diff > 0.0 {
-            ("Up", m5_up)
-        } else {
-            ("Down", m5_down)
-        };
-
-        let _ = writeln!(
-            md, "- **Winner**: {} (diff={}{})",
-            winner, if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
+        let summary = format!(
+            "{} | {} ptb=${} close=${} diff={}${} ({}%)",
+            period_str, prediction, price_to_beat, close_price,
+            if diff >= 0.0 { "+" } else { "-" }, diff.abs(),
+            format!("{:.3}", diff_pct),
         );
-        let _ = writeln!(md, "- **Winning asset**: `{}`\n", winning_token);
-
-        // Subscribe to winning token orderbook after determining winner
-        info!("{} subscribing to winning token orderbook...", symbol);
-        if let Err(e) = orderbook_mirror.subscribe(&[winning_token]).await {
-            warn!("{} orderbook subscribe failed: {}", symbol, e);
-        }
-
-        // Dump orderbook every 2s so we can see how it evolves post-close
-        let _ = writeln!(md, "### Winning side ({}) orderbook snapshots", winner);
-        let start = std::time::Instant::now();
-        let mut snapshot_num = 0u32;
-        let mut last_summary = OrderbookSnapshot { md: String::new(), capped_shares: 0.0, avg_price: 0.0, profit: 0.0 };
-        loop {
-            let elapsed = start.elapsed().as_secs();
-            if elapsed >= POST_CLOSE_MONITOR_SECS {
-                break;
-            }
-            // Wait for orderbook data (first iteration) or next update (subsequent)
-            if snapshot_num == 0 {
-                // Give WS a moment to deliver initial snapshot
-                sleep(Duration::from_millis(500)).await;
-            }
-
-            let ob_opt = orderbook_mirror.get_orderbook(winning_token).await;
-            if let Some(ref ob) = ob_opt {
-                // Only dump if there are sweepable asks (price <= sweep_max_price)
-                let sweepable_asks: Vec<_> = {
-                    let mut sorted = ob.asks.clone();
-                    sorted.retain(|a| {
-                        let p: f64 = a.price.to_string().parse().unwrap_or(1.0);
-                        p <= cfg.sweep_max_price
-                    });
-                    sorted.sort_by(|a, b| a.price.cmp(&b.price));
-                    sorted
-                };
-
-                if sweepable_asks.is_empty() {
-                    continue;
-                }
-
-                snapshot_num += 1;
-                let elapsed_s = start.elapsed().as_secs();
-                let ts = Utc::now().format("%H:%M:%S");
-                let asks_summary: Vec<String> = sweepable_asks.iter()
-                    .take(5)
-                    .map(|a| format!("{}x{}", a.price, a.size))
-                    .collect();
-                info!(
-                    "[OB {} {} T+{}s {} cid={} asset={}] asks: {}",
-                    symbol, winner, elapsed_s, ts,
-                    &condition_id[..condition_id.len().min(12)],
-                    &winning_token[..winning_token.len().min(12)],
-                    asks_summary.join(", "),
-                );
-
-                // Detailed snapshot for paper_trade.md
-                let _ = writeln!(md, "\n**T+{}s ({}) snapshot #{}:**", elapsed_s, ts, snapshot_num);
-                last_summary = self.snapshot_orderbook(cfg, winning_token, winner, orderbook_mirror).await;
-                let _ = write!(md, "{}", last_summary.md);
-            }
-
-            sleep(Duration::from_secs(OB_DUMP_INTERVAL_SECS)).await;
-        }
-
-        let post_summary = last_summary;
-
-        // === Verdict ===
-        let favorable = post_summary.capped_shares > 0.0;
-        if favorable {
-            let _ = writeln!(
-                md, "**FAVORABLE** — {:.2} sweepable shares found post-close (avg {:.4}, P&L ${:.2})\n",
-                post_summary.capped_shares, post_summary.avg_price, post_summary.profit
-            );
-        } else {
-            let _ = writeln!(md, "**NO FAVORABLE ASKS** found in post-close window\n");
-        }
-        let _ = writeln!(md, "---\n");
-
-        self.log_entry(symbol, &md).await;
-
-        // Log buffer summary
-        let summary = if favorable {
-            format!(
-                "{} | {} ptb=${} close=${} diff={}{} | post-close: {:.2}sh @ {:.4} -> P&L ${:.2}",
-                period_str, winner, price_to_beat, latest_price,
-                if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
-                post_summary.capped_shares, post_summary.avg_price, post_summary.profit
-            )
-        } else {
-            format!(
-                "{} | {} ptb=${} close=${} diff={}{} | no favorable asks post-close",
-                period_str, winner, price_to_beat, latest_price,
-                if diff >= 0.0 { "+$" } else { "-$" }, diff.abs(),
-            )
-        };
         self.log_buffer.push(symbol, "info", summary).await;
+
+        Some(record)
     }
 
-    /// Take a snapshot of the winning token's orderbook and return formatted summary.
-    async fn snapshot_orderbook(
-        &self,
-        cfg: &StrategyConfig,
-        winning_token: &str,
-        _winner: &str,
-        orderbook_mirror: &OrderbookMirror,
-    ) -> OrderbookSnapshot {
-        let orderbook_opt = orderbook_mirror.get_orderbook(winning_token).await;
-        let mut md = String::new();
+    /// Log resolution result after polling completes.
+    pub async fn log_resolution(&self, record: &PredictionRecord, actual: Option<&str>, api_question: Option<&str>) {
+        let api_ptb_str = api_question
+            .and_then(parse_price_to_beat_from_question)
+            .map(|p| format!(" | API PTB: ${}", p))
+            .unwrap_or_default();
 
-        match orderbook_opt {
-            Some(orderbook) => {
-                let _ = writeln!(md, "| Price | Size | USD |");
-                let _ = writeln!(md, "|-------|------|-----|");
-
-                let mut sweepable_levels = 0u32;
-                let mut sweepable_shares = 0.0f64;
-                let mut sweepable_cost = 0.0f64;
-                let mut capped_cost = 0.0f64;
-                let mut capped_shares = 0.0f64;
-                let mut capped_levels = 0u32;
-
-                let mut sorted_asks = orderbook.asks.clone();
-                sorted_asks.sort_by(|a, b| b.price.cmp(&a.price));
-
-                for ask in &sorted_asks {
-                    let p: f64 = ask.price.to_string().parse().unwrap_or(1.0);
-                    let s: f64 = ask.size.to_string().parse().unwrap_or(0.0);
-                    let usd = p * s;
-                    let in_range = p <= cfg.sweep_max_price;
-                    let marker = if in_range && capped_cost < cfg.max_sweep_cost { " *" } else { "" };
-                    let _ = writeln!(md, "| {} | {} | ${:.2} |{}", p, s, usd, marker);
-
-                    if in_range {
-                        sweepable_levels += 1;
-                        sweepable_shares += s;
-                        sweepable_cost += usd;
-                        if capped_cost < cfg.max_sweep_cost {
-                            let remaining_budget = cfg.max_sweep_cost - capped_cost;
-                            let buyable_usd = usd.min(remaining_budget);
-                            let buyable_shares = if p > 0.0 { buyable_usd / p } else { 0.0 };
-                            capped_cost += buyable_usd;
-                            capped_shares += buyable_shares;
-                            capped_levels += 1;
-                        }
-                    }
-                }
-
-                let _ = writeln!(md);
-                let _ = writeln!(
-                    md, "Sweepable (<= {}): {} levels, {:.2} shares, ${:.2}",
-                    cfg.sweep_max_price, sweepable_levels, sweepable_shares, sweepable_cost
-                );
-
-                let avg_price = if capped_shares > 0.0 { capped_cost / capped_shares } else { 0.0 };
-                let profit = if capped_shares > 0.0 { capped_shares * (1.0 - avg_price) } else { 0.0 };
-
-                if capped_shares > 0.0 {
-                    let _ = writeln!(
-                        md, "Within budget (${}): {} levels, {:.2} shares, ${:.2} cost, avg {:.4}",
-                        cfg.max_sweep_cost, capped_levels, capped_shares, capped_cost, avg_price
-                    );
-                    let _ = writeln!(
-                        md, "Hypothetical P&L: {:.2} shares @ {:.4} -> ${:.2}\n",
-                        capped_shares, avg_price, profit
-                    );
+        let md = match actual {
+            Some(winner) => {
+                let correct = winner == record.prediction;
+                let resolved_at = Utc::now().to_rfc3339();
+                if correct {
+                    format!(
+                        "- **{}** Resolution: {} \u{2705} | PTB: ${} | Close: ${} |{} Resolved at: {}\n---\n\n",
+                        record.symbol.to_uppercase(), winner,
+                        record.price_to_beat, record.close_price,
+                        api_ptb_str, resolved_at
+                    )
                 } else {
-                    let _ = writeln!(md, "No sweepable asks within budget\n");
+                    format!(
+                        "- **{}** Resolution: {} \u{274C} (predicted {}) | PTB: ${} | Close: ${} |{} Resolved at: {}\n---\n\n",
+                        record.symbol.to_uppercase(), winner, record.prediction,
+                        record.price_to_beat, record.close_price,
+                        api_ptb_str, resolved_at
+                    )
                 }
-
-                OrderbookSnapshot { md, capped_shares, avg_price, profit }
             }
             None => {
-                let _ = writeln!(md, "No orderbook data in WS mirror\n");
-                OrderbookSnapshot { md, capped_shares: 0.0, avg_price: 0.0, profit: 0.0 }
+                format!(
+                    "- **{}** Resolution: TIMEOUT (predicted {}) | PTB: ${} | Close: ${}\n---\n\n",
+                    record.symbol.to_uppercase(), record.prediction,
+                    record.price_to_beat, record.close_price
+                )
             }
-        }
+        };
+
+        self.append_file(PAPER_TRADE_FILE, &md).await;
+
+        // Write CSV row
+        let correct = actual.map(|a| a == record.prediction).unwrap_or(false);
+        let actual_str = actual.unwrap_or("TIMEOUT");
+        self.write_csv_row(record, actual_str, correct).await;
+
+        let log_msg = match actual {
+            Some(w) if w == record.prediction => format!("{} | {} CORRECT", record.period_str, record.symbol),
+            Some(w) => format!("{} | {} WRONG (predicted {} actual {})", record.period_str, record.symbol, record.prediction, w),
+            None => format!("{} | {} TIMEOUT", record.period_str, record.symbol),
+        };
+        self.log_buffer.push(&record.symbol, "info", log_msg).await;
     }
 
-    /// Log entry to both stdout and paper_trade.md file.
-    async fn log_entry(&self, symbol: &str, content: &str) {
-        info!("Paper trade [{}]:\n{}", symbol, content);
+    /// Append a row to predictions.csv (creating with header if needed).
+    async fn write_csv_row(&self, record: &PredictionRecord, actual: &str, correct: bool) {
+        let file_exists = tokio::fs::metadata(PREDICTIONS_CSV).await.is_ok();
 
+        let mut content = String::new();
+        if !file_exists {
+            let _ = writeln!(content, "date,period,symbol,condition_id,ptb,close_price,prediction,actual,correct,close_rtds_ts,system_read_ts,age_s,diff,diff_pct");
+        }
+        let date = Utc::now().format("%Y-%m-%d");
+        let _ = writeln!(
+            content,
+            "{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
+            date, record.period_5, record.symbol, record.condition_id,
+            record.price_to_beat, record.close_price,
+            record.prediction, actual, correct,
+            record.close_rtds_ts_ms, record.system_read_ts_ms,
+            record.age_s, record.diff, format!("{:.3}", record.diff_pct),
+        );
+
+        self.append_file(PREDICTIONS_CSV, &content).await;
+    }
+
+    /// Append content to a file.
+    async fn append_file(&self, path: &str, content: &str) {
         match OpenOptions::new()
             .create(true)
             .append(true)
-            .open(PAPER_TRADE_FILE)
+            .open(path)
             .await
         {
             Ok(mut file) => {
                 if let Err(e) = file.write_all(content.as_bytes()).await {
-                    warn!("Failed to write paper_trade.md: {}", e);
+                    warn!("Failed to write {}: {}", path, e);
                 }
             }
             Err(e) => {
-                warn!("Failed to open paper_trade.md: {}", e);
+                warn!("Failed to open {}: {}", path, e);
             }
         }
     }
-}
-
-struct OrderbookSnapshot {
-    md: String,
-    capped_shares: f64,
-    avg_price: f64,
-    profit: f64,
 }

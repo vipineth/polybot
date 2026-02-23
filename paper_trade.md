@@ -1,455 +1,197 @@
-## BTC | February 22, 1:30PM-1:35PM ET
+## XRP | February 22, 11:10PM-11:15PM ET
 
-- **Price-to-beat**: $67322.65245706012
-- **Close price (RTDS WS)**: $67314.66016690395 (age=1s)
-- **Winner**: Down (diff=-$7.992290156165836)
-
-- **Orderbook tracked**: 5s, 476 updates
-
-### Up token asks (at close) 
-| Price | Size | USD |
-|-------|------|-----|
-| 0.99 | 6735.94 | $6668.58 | *
-| 0.98 | 2373.04 | $2325.58 |
-| 0.97 | 354.81 | $344.17 |
-
-Sweepable (<= 0.995): 3 levels, 9463.79 shares, $9338.33
-Within budget ($500): 1 levels, 505.05 shares, $500.00 cost, avg 0.9900
-Hypothetical P&L: 505.05 shares @ 0.9900 -> $5.05
-
-### Down token asks (at close) ← WINNER
-| Price | Size | USD |
-|-------|------|-----|
-| 0.99 | 9673.53 | $9576.79 | *
-| 0.98 | 3035.72 | $2975.01 |
-| 0.97 | 1443.31 | $1400.01 |
-| 0.96 | 915.92 | $879.28 |
-| 0.95 | 949 | $901.55 |
-| 0.94 | 754.31 | $709.05 |
-| 0.93 | 218.13 | $202.86 |
-| 0.92 | 177 | $162.84 |
-| 0.91 | 348.22 | $316.88 |
-| 0.9 | 816.45 | $734.81 |
-| 0.89 | 49.99 | $44.49 |
-| 0.88 | 200 | $176.00 |
-| 0.83 | 14 | $11.62 |
-| 0.82 | 50 | $41.00 |
-| 0.78 | 20 | $15.60 |
-| 0.75 | 13 | $9.75 |
-| 0.74 | 15 | $11.10 |
-| 0.72 | 264.57 | $190.49 |
-| 0.7 | 56.96 | $39.87 |
-| 0.6 | 8.12 | $4.87 |
-| 0.57 | 6 | $3.42 |
-| 0.52 | 25 | $13.00 |
-| 0.5 | 174.07 | $87.03 |
-| 0.49 | 45 | $22.05 |
-| 0.48 | 38.56 | $18.51 |
-| 0.47 | 43.14 | $20.28 |
-| 0.46 | 30.96 | $14.24 |
-| 0.45 | 210.3 | $94.64 |
-| 0.44 | 37.11 | $16.33 |
-| 0.43 | 35.96 | $15.46 |
-| 0.42 | 51.59 | $21.67 |
-| 0.41 | 81.97 | $33.61 |
-| 0.4 | 100 | $40.00 |
-| 0.39 | 9 | $3.51 |
-| 0.37 | 5 | $1.85 |
-| 0.36 | 30 | $10.80 |
-| 0.35 | 25 | $8.75 |
-| 0.33 | 25 | $8.25 |
-| 0.31 | 70.04 | $21.71 |
-| 0.3 | 12.15 | $3.65 |
-| 0.29 | 100 | $29.00 |
-| 0.28 | 30 | $8.40 |
-| 0.26 | 10 | $2.60 |
-| 0.23 | 119.94 | $27.59 |
-| 0.22 | 40 | $8.80 |
-| 0.21 | 10 | $2.10 |
-| 0.17 | 27 | $4.59 |
-| 0.16 | 32 | $5.12 |
-| 0.14 | 119 | $16.66 |
-| 0.13 | 52.62 | $6.84 |
-| 0.08 | 74.87 | $5.99 |
-| 0.06 | 41.33 | $2.48 |
-
-Sweepable (<= 0.995): 52 levels, 20735.84 shares, $18982.79
-Within budget ($500): 1 levels, 505.05 shares, $500.00 cost, avg 0.9900
-Hypothetical P&L: 505.05 shares @ 0.9900 -> $5.05
-
-### Winning side (Down) after 10s post-close
-| Price | Size | USD |
-|-------|------|-----|
-| 0.99 | 8656.53 | $8569.96 | *
-| 0.98 | 2206.2 | $2162.08 |
-| 0.97 | 1178 | $1142.66 |
-| 0.96 | 15685.92 | $15058.48 |
-| 0.95 | 21369 | $20300.55 |
-| 0.94 | 15654.33 | $14715.07 |
-| 0.93 | 115.29 | $107.22 |
-| 0.92 | 114.5 | $105.34 |
-| 0.91 | 254.89 | $231.95 |
-| 0.9 | 591.64 | $532.48 |
-| 0.89 | 8049.99 | $7164.49 |
-| 0.88 | 10000 | $8800.00 |
-| 0.86 | 8000 | $6880.00 |
-| 0.85 | 13.33 | $11.33 |
-| 0.82 | 50 | $41.00 |
-| 0.8 | 10 | $8.00 |
-| 0.78 | 20 | $15.60 |
-| 0.75 | 8 | $6.00 |
-| 0.74 | 15 | $11.10 |
-| 0.72 | 264.57 | $190.49 |
-| 0.7 | 47.63 | $33.34 |
-| 0.65 | 6 | $3.90 |
-| 0.6 | 5515.5 | $3309.30 |
-| 0.59 | 344 | $202.96 |
-| 0.58 | 1344 | $779.52 |
-| 0.57 | 1350 | $769.50 |
-| 0.56 | 344 | $192.64 |
-| 0.55 | 349.25 | $192.09 |
-| 0.54 | 344 | $185.76 |
-| 0.53 | 344 | $182.32 |
-| 0.52 | 369 | $191.88 |
-| 0.51 | 344 | $175.44 |
-| 0.5 | 523.07 | $261.54 |
-| 0.49 | 8389 | $4110.61 |
-| 0.48 | 382.56 | $183.63 |
-| 0.47 | 387.14 | $181.96 |
-| 0.46 | 374.96 | $172.48 |
-| 0.45 | 379.96 | $170.98 |
-| 0.44 | 374.96 | $164.98 |
-| 0.43 | 379.96 | $163.38 |
-| 0.42 | 395.59 | $166.15 |
-| 0.41 | 425.97 | $174.65 |
-| 0.4 | 449 | $179.60 |
-| 0.39 | 353 | $137.67 |
-| 0.38 | 344 | $130.72 |
-| 0.37 | 349 | $129.13 |
-| 0.36 | 374 | $134.64 |
-| 0.35 | 376 | $131.60 |
-| 0.34 | 344 | $116.96 |
-| 0.33 | 344 | $113.52 |
-| 0.32 | 344 | $110.08 |
-| 0.31 | 384 | $119.04 |
-| 0.3 | 5510 | $1653.00 |
-| 0.29 | 5000 | $1450.00 |
-| 0.28 | 10 | $2.80 |
-| 0.27 | 5000 | $1350.00 |
-| 0.25 | 6000 | $1500.00 |
-| 0.23 | 65.26 | $15.01 |
-| 0.2 | 5510 | $1102.00 |
-| 0.14 | 5 | $0.70 |
-| 0.1 | 21290.27 | $2129.03 |
-| 0.09 | 6000 | $540.00 |
-| 0.08 | 20535 | $1642.80 |
-| 0.07 | 12030.75 | $842.15 |
-| 0.06 | 8560.63 | $513.64 |
-| 0.05 | 65 | $3.25 |
-| 0.04 | 17548 | $701.92 |
-| 0.03 | 3019 | $90.57 |
-| 0.02 | 35559 | $711.18 |
-| 0.01 | 460076.72 | $4600.77 |
-
-Sweepable (<= 0.995): 70 levels, 730417.37 shares, $118174.58
-Within budget ($500): 1 levels, 505.05 shares, $500.00 cost, avg 0.9900
-Hypothetical P&L: 505.05 shares @ 0.9900 -> $5.05
-
-**FAVORABLE** — 505.05 sweepable shares found post-close (avg 0.9900, P&L $5.05)
-
+- PTB: $1.33997625 | Close: $1.3401950363097384 | Prediction: Up
+- Close RTDS ts: 1771820098000 | System read: 1771820100112 | Age: 2s
+- Diff: +$0.0002187863097382614 (0.016%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"1340195036309738400","symbol":"xrp/usd","timestamp":1771820098000,"value":1.3401950363097384},"timestamp":1771820099421,"topic":"crypto_prices_chainlink","type":"update"}
+- Resolution: Up (CORRECT) | Resolved at: 2026-02-23T04:22:02.604772+00:00
 ---
 
-## ETH | February 22, 1:30PM-1:35PM ET
+## BTC | February 22, 11:20PM-11:25PM ET
 
-- **Price-to-beat**: $1940.41415
-- **Close price (RTDS WS)**: $1940.77315 (age=2s)
-- **Winner**: Up (diff=+$0.3589999999999236)
+- PTB: $64928.76883506973 | Close: $64790.08246810615 | Prediction: Down
+- Close RTDS ts: 1771820699000 | System read: 1771820700671 | Age: 1s
+- Diff: -$138.68636696357862 (0.214%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"64790082468106150000000","symbol":"btc/usd","timestamp":1771820699000,"value":64790.08246810615},"timestamp":1771820699964,"topic":"crypto_prices_chainlink","type":"update"}
+## ETH | February 22, 11:20PM-11:25PM ET
 
-- **Orderbook tracked**: 15s, 678 updates
+- PTB: $1863.013836 | Close: $1860.743845 | Prediction: Down
+- Close RTDS ts: 1771820699000 | System read: 1771820700671 | Age: 1s
+- Diff: -$2.269991000000118 (0.122%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"1860743845000000000000","symbol":"eth/usd","timestamp":1771820699000,"value":1860.743845},"timestamp":1771820699946,"topic":"crypto_prices_chainlink","type":"update"}
+## SOL | February 22, 11:20PM-11:25PM ET
 
-### Up token asks (at close) ← WINNER
-| Price | Size | USD |
-|-------|------|-----|
+- PTB: $77.67508524191737 | Close: $77.5325302779664 | Prediction: Down
+- Close RTDS ts: 1771820699000 | System read: 1771820700672 | Age: 1s
+- Diff: -$0.14255496395097111 (0.184%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"77532530277966395000","symbol":"sol/usd","timestamp":1771820699000,"value":77.5325302779664},"timestamp":1771820699927,"topic":"crypto_prices_chainlink","type":"update"}
+## XRP | February 22, 11:20PM-11:25PM ET
 
-Sweepable (<= 0.995): 0 levels, 0.00 shares, $0.00
-No sweepable asks within budget
-
-### Down token asks (at close) 
-| Price | Size | USD |
-|-------|------|-----|
-| 0.99 | 1984.59 | $1964.74 | *
-| 0.98 | 110 | $107.80 |
-| 0.97 | 55 | $53.35 |
-| 0.96 | 15305 | $14692.80 |
-| 0.95 | 62.68 | $59.55 |
-| 0.94 | 15100 | $14194.00 |
-| 0.93 | 5 | $4.65 |
-| 0.92 | 6 | $5.52 |
-| 0.91 | 5 | $4.55 |
-| 0.9 | 149.99 | $134.99 |
-| 0.89 | 8055 | $7168.95 |
-| 0.87 | 10 | $8.70 |
-| 0.86 | 8000 | $6880.00 |
-| 0.85 | 18.33 | $15.58 |
-| 0.82 | 49.99 | $40.99 |
-| 0.81 | 5 | $4.05 |
-| 0.8 | 25 | $20.00 |
-| 0.75 | 8 | $6.00 |
-| 0.7 | 22.02 | $15.41 |
-| 0.65 | 6 | $3.90 |
-| 0.6 | 5515.5 | $3309.30 |
-| 0.58 | 1000 | $580.00 |
-| 0.57 | 1000 | $570.00 |
-| 0.55 | 5.25 | $2.89 |
-| 0.5 | 5 | $2.50 |
-| 0.48 | 5 | $2.40 |
-| 0.45 | 5 | $2.25 |
-| 0.4 | 5 | $2.00 |
-| 0.3 | 5510 | $1653.00 |
-| 0.29 | 3000 | $870.00 |
-| 0.27 | 5000 | $1350.00 |
-| 0.2 | 5510 | $1102.00 |
-| 0.12 | 15.95 | $1.91 |
-| 0.11 | 19.67 | $2.16 |
-| 0.1 | 29088 | $2908.80 |
-| 0.09 | 11510 | $1035.90 |
-| 0.08 | 12000 | $960.00 |
-| 0.07 | 8510 | $595.70 |
-| 0.06 | 8516 | $510.96 |
-| 0.05 | 8530 | $426.50 |
-| 0.04 | 17529 | $701.16 |
-| 0.03 | 3019 | $90.57 |
-| 0.02 | 21549 | $430.98 |
-| 0.01 | 371513.07 | $3715.13 |
-
-Sweepable (<= 0.995): 44 levels, 567343.04 shares, $66211.65
-Within budget ($500): 1 levels, 505.05 shares, $500.00 cost, avg 0.9900
-Hypothetical P&L: 505.05 shares @ 0.9900 -> $5.05
-
-### Winning side (Up) after 10s post-close
-| Price | Size | USD |
-|-------|------|-----|
-
-Sweepable (<= 0.995): 0 levels, 0.00 shares, $0.00
-No sweepable asks within budget
-
-**NO FAVORABLE ASKS** found in post-close window
-
+- PTB: $1.338143 | Close: $1.3382763045737176 | Prediction: Up
+- Close RTDS ts: 1771820699000 | System read: 1771820700672 | Age: 1s
+- Diff: +$0.0001333045737175187 (0.010%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"1338276304573717700","symbol":"xrp/usd","timestamp":1771820699000,"value":1.3382763045737176},"timestamp":1771820700013,"topic":"crypto_prices_chainlink","type":"update"}
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T04:30:32.677577+00:00
 ---
 
-## SOL | February 22, 1:30PM-1:35PM ET
-
-- **Price-to-beat**: $83.1057363127928
-- **Close price (RTDS WS)**: $83.0293735 (age=2s)
-- **Winner**: Down (diff=-$0.07636281279279444)
-
-- **Orderbook tracked**: 25s, 718 updates
-
-### Up token asks (at close) 
-| Price | Size | USD |
-|-------|------|-----|
-| 0.99 | 2039.5 | $2019.11 | *
-| 0.98 | 161 | $157.78 |
-| 0.97 | 729 | $707.13 |
-| 0.96 | 14 | $13.44 |
-| 0.95 | 54 | $51.30 |
-| 0.94 | 109 | $102.46 |
-| 0.93 | 14 | $13.02 |
-| 0.92 | 15 | $13.80 |
-| 0.91 | 9 | $8.19 |
-| 0.9 | 128.98 | $116.08 |
-| 0.89 | 59 | $52.51 |
-| 0.88 | 9 | $7.92 |
-| 0.87 | 19 | $16.53 |
-| 0.86 | 9 | $7.74 |
-| 0.85 | 22.33 | $18.98 |
-| 0.84 | 9 | $7.56 |
-| 0.83 | 9 | $7.47 |
-| 0.82 | 58.98 | $48.36 |
-| 0.81 | 9 | $7.29 |
-| 0.8 | 19 | $15.20 |
-| 0.79 | 9 | $7.11 |
-| 0.78 | 9 | $7.02 |
-| 0.77 | 14 | $10.78 |
-| 0.76 | 9 | $6.84 |
-| 0.75 | 22 | $16.50 |
-| 0.74 | 9 | $6.66 |
-| 0.73 | 9 | $6.57 |
-| 0.72 | 9 | $6.48 |
-| 0.71 | 9 | $6.39 |
-| 0.7 | 20.67 | $14.47 |
-| 0.69 | 9 | $6.21 |
-| 0.68 | 9 | $6.12 |
-| 0.67 | 9 | $6.03 |
-| 0.66 | 9 | $5.94 |
-| 0.65 | 15 | $9.75 |
-| 0.64 | 9 | $5.76 |
-| 0.63 | 9 | $5.67 |
-| 0.62 | 9 | $5.58 |
-| 0.61 | 9 | $5.49 |
-| 0.6 | 14.5 | $8.70 |
-| 0.59 | 9 | $5.31 |
-| 0.58 | 9 | $5.22 |
-| 0.57 | 9 | $5.13 |
-| 0.56 | 9 | $5.04 |
-| 0.55 | 14.25 | $7.84 |
-| 0.54 | 9 | $4.86 |
-| 0.53 | 9 | $4.77 |
-| 0.52 | 9 | $4.68 |
-| 0.51 | 9 | $4.59 |
-| 0.5 | 14 | $7.00 |
-| 0.49 | 24 | $11.76 |
-| 0.48 | 9 | $4.32 |
-| 0.47 | 9 | $4.23 |
-| 0.46 | 9 | $4.14 |
-| 0.45 | 14 | $6.30 |
-| 0.44 | 17 | $7.48 |
-| 0.43 | 9 | $3.87 |
-| 0.42 | 9 | $3.78 |
-| 0.41 | 9 | $3.69 |
-| 0.4 | 24 | $9.60 |
-| 0.39 | 9 | $3.51 |
-| 0.38 | 9 | $3.42 |
-| 0.37 | 9 | $3.33 |
-| 0.36 | 9 | $3.24 |
-| 0.35 | 29.38 | $10.28 |
-| 0.34 | 9 | $3.06 |
-| 0.33 | 9 | $2.97 |
-| 0.32 | 9 | $2.88 |
-| 0.31 | 9 | $2.79 |
-| 0.3 | 9 | $2.70 |
-| 0.29 | 9 | $2.61 |
-| 0.28 | 9 | $2.52 |
-| 0.27 | 9 | $2.43 |
-| 0.26 | 9 | $2.34 |
-| 0.25 | 9 | $2.25 |
-| 0.24 | 9 | $2.16 |
-| 0.23 | 9 | $2.07 |
-| 0.22 | 30.94 | $6.81 |
-| 0.21 | 9 | $1.89 |
-| 0.2 | 9 | $1.80 |
-| 0.19 | 9 | $1.71 |
-| 0.18 | 9 | $1.62 |
-| 0.17 | 9 | $1.53 |
-| 0.16 | 9 | $1.44 |
-| 0.15 | 9 | $1.35 |
-| 0.14 | 9 | $1.26 |
-| 0.13 | 14.74 | $1.92 |
-| 0.12 | 9 | $1.08 |
-| 0.11 | 9 | $0.99 |
-| 0.1 | 9 | $0.90 |
-| 0.09 | 9 | $0.81 |
-| 0.08 | 9 | $0.72 |
-| 0.07 | 19 | $1.33 |
-| 0.06 | 5.52 | $0.33 |
-| 0.05 | 9 | $0.45 |
-| 0.03 | 50 | $1.50 |
-| 0.02 | 84.78 | $1.70 |
-| 0.01 | 3551.78 | $35.52 |
-
-Sweepable (<= 0.995): 98 levels, 8007.35 shares, $3780.76
-Within budget ($500): 1 levels, 505.05 shares, $500.00 cost, avg 0.9900
-Hypothetical P&L: 505.05 shares @ 0.9900 -> $5.05
-
-### Down token asks (at close) ← WINNER
-| Price | Size | USD |
-|-------|------|-----|
-
-Sweepable (<= 0.995): 0 levels, 0.00 shares, $0.00
-No sweepable asks within budget
-
-### Winning side (Down) after 10s post-close
-| Price | Size | USD |
-|-------|------|-----|
-
-Sweepable (<= 0.995): 0 levels, 0.00 shares, $0.00
-No sweepable asks within budget
-
-**NO FAVORABLE ASKS** found in post-close window
-
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T04:30:32.677852+00:00
 ---
 
-## XRP | February 22, 1:30PM-1:35PM ET
-
-- **Price-to-beat**: $1.3892149218223686
-- **Close price (RTDS WS)**: $1.38800955 (age=1s)
-- **Winner**: Down (diff=-$0.0012053718223685728)
-
-- **Orderbook tracked**: 35s, 764 updates
-
-### Up token asks (at close) 
-| Price | Size | USD |
-|-------|------|-----|
-| 0.99 | 1603.5 | $1587.46 | *
-| 0.98 | 152 | $148.96 |
-| 0.97 | 20 | $19.40 |
-| 0.96 | 5 | $4.80 |
-| 0.95 | 345 | $327.75 |
-| 0.94 | 100 | $94.00 |
-| 0.93 | 5 | $4.65 |
-| 0.9 | 109.97 | $98.97 |
-| 0.89 | 50 | $44.50 |
-| 0.87 | 10 | $8.70 |
-| 0.85 | 13.33 | $11.33 |
-| 0.82 | 49.99 | $40.99 |
-| 0.8 | 10 | $8.00 |
-| 0.76 | 5 | $3.80 |
-| 0.75 | 8 | $6.00 |
-| 0.7 | 6.67 | $4.67 |
-| 0.65 | 6 | $3.90 |
-| 0.6 | 5.5 | $3.30 |
-| 0.55 | 5.25 | $2.89 |
-| 0.5 | 5 | $2.50 |
-| 0.49 | 15 | $7.35 |
-| 0.48 | 5 | $2.40 |
-| 0.45 | 5 | $2.25 |
-| 0.4 | 5 | $2.00 |
-| 0.33 | 27 | $8.91 |
-| 0.16 | 25.54 | $4.09 |
-| 0.12 | 5 | $0.60 |
-| 0.08 | 25 | $2.00 |
-| 0.05 | 13.13 | $0.66 |
-| 0.03 | 252.67 | $7.58 |
-| 0.02 | 78.58 | $1.57 |
-| 0.01 | 845.92 | $8.46 |
-
-Sweepable (<= 0.995): 32 levels, 3818.05 shares, $2474.44
-Within budget ($500): 1 levels, 505.05 shares, $500.00 cost, avg 0.9900
-Hypothetical P&L: 505.05 shares @ 0.9900 -> $5.05
-
-### Down token asks (at close) ← WINNER
-| Price | Size | USD |
-|-------|------|-----|
-
-Sweepable (<= 0.995): 0 levels, 0.00 shares, $0.00
-No sweepable asks within budget
-
-### Winning side (Down) after 10s post-close
-| Price | Size | USD |
-|-------|------|-----|
-
-Sweepable (<= 0.995): 0 levels, 0.00 shares, $0.00
-No sweepable asks within budget
-
-**NO FAVORABLE ASKS** found in post-close window
-
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T04:30:32.677994+00:00
 ---
 
-## BTC | February 22, 1:40PM-1:45PM ET
-
-- **Price-to-beat**: $67357.4476371817
-- **Close price (RTDS WS)**: $67356.70572746651 (age=2s)
-- **BELOW MARGIN** — diff $0.741909715186921 < min $6.73574476371817 (0.01%)
+- Resolution: Up (CORRECT) | Resolved at: 2026-02-23T04:30:32.678188+00:00
 ---
 
-## ETH | February 22, 1:40PM-1:45PM ET
+## BTC | February 22, 11:30PM-11:35PM ET
 
-- **Price-to-beat**: $1940.79
-- **Close price (RTDS WS)**: $1941.089712 (age=2s)
-- **Winner**: Up (diff=+$0.29971199999999953)
+- PTB: $64758.90785601666 | Close: $64753.026193516445 | Prediction: Down
+- Close RTDS ts: 1771821298000 | System read: 1771821300205 | Age: 2s
+- Diff: -$5.881662500214588 (0.009%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"64753026193516445000000","symbol":"btc/usd","timestamp":1771821298000,"value":64753.026193516445},"timestamp":1771821299106,"topic":"crypto_prices_chainlink","type":"update"}
+## ETH | February 22, 11:30PM-11:35PM ET
 
-### Winning side (Up) orderbook snapshots
-**NO FAVORABLE ASKS** found in post-close window
+- PTB: $1860.109268 | Close: $1858.577922 | Prediction: Down
+- Close RTDS ts: 1771821298000 | System read: 1771821300205 | Age: 2s
+- Diff: -$1.531345999999985 (0.082%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"1858577922000000000000","symbol":"eth/usd","timestamp":1771821298000,"value":1858.577922},"timestamp":1771821299204,"topic":"crypto_prices_chainlink","type":"update"}
+## SOL | February 22, 11:30PM-11:35PM ET
 
+- PTB: $77.51766 | Close: $77.55185460162075 | Prediction: Up
+- Close RTDS ts: 1771821298000 | System read: 1771821300205 | Age: 2s
+- Diff: +$0.03419460162074017 (0.044%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"77551854601620750000","symbol":"sol/usd","timestamp":1771821298000,"value":77.55185460162075},"timestamp":1771821299146,"topic":"crypto_prices_chainlink","type":"update"}
+## XRP | February 22, 11:30PM-11:35PM ET
+
+- PTB: $1.3392473 | Close: $1.340363125400471 | Prediction: Up
+- Close RTDS ts: 1771821298000 | System read: 1771821300205 | Age: 2s
+- Diff: +$0.00111582540047106 (0.083%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"1340363125400471300","symbol":"xrp/usd","timestamp":1771821298000,"value":1.3403631254004713},"timestamp":1771821299200,"topic":"crypto_prices_chainlink","type":"update"}
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T04:39:46.790675+00:00
 ---
 
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T04:39:46.791616+00:00
+---
+
+- Resolution: Up (CORRECT) | Resolved at: 2026-02-23T04:39:46.792593+00:00
+---
+
+- Resolution: Up (CORRECT) | Resolved at: 2026-02-23T04:39:46.792820+00:00
+---
+
+## BTC | February 22, 11:35PM-11:40PM ET
+
+- PTB: $64753.726911 | Close: $64670.43898586293 | Prediction: Down
+- Close RTDS ts: 1771821598000 | System read: 1771821600866 | Age: 2s
+- Diff: -$83.28792513706867 (0.129%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"64670438985862932500000","symbol":"btc/usd","timestamp":1771821598000,"value":64670.43898586293},"timestamp":1771821599159,"topic":"crypto_prices_chainlink","type":"update"}
+## ETH | February 22, 11:35PM-11:40PM ET
+
+- PTB: $1858.8004375 | Close: $1854.2745316252417 | Prediction: Down
+- Close RTDS ts: 1771821598000 | System read: 1771821600866 | Age: 2s
+- Diff: -$4.525905874758337 (0.243%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"1854274531625241450000","symbol":"eth/usd","timestamp":1771821598000,"value":1854.2745316252415},"timestamp":1771821599180,"topic":"crypto_prices_chainlink","type":"update"}
+## SOL | February 22, 11:35PM-11:40PM ET
+
+- PTB: $77.56426137711736 | Close: $77.18326513783151 | Prediction: Down
+- Close RTDS ts: 1771821598000 | System read: 1771821600867 | Age: 2s
+- Diff: -$0.38099623928584947 (0.491%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"77183265137831510000","symbol":"sol/usd","timestamp":1771821598000,"value":77.18326513783151},"timestamp":1771821599169,"topic":"crypto_prices_chainlink","type":"update"}
+## XRP | February 22, 11:35PM-11:40PM ET
+
+- PTB: $1.340589737731457 | Close: $1.337134 | Prediction: Down
+- Close RTDS ts: 1771821598000 | System read: 1771821600867 | Age: 2s
+- Diff: -$0.0034557377314570203 (0.258%)
+- Raw RTDS: {"connection_id":"ZN3dGejyLPECHGA=","payload":{"full_accuracy_value":"1337134000000000000","symbol":"xrp/usd","timestamp":1771821598000,"value":1.337134},"timestamp":1771821599164,"topic":"crypto_prices_chainlink","type":"update"}
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T05:12:41.562649+00:00
+---
+
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T05:12:41.562836+00:00
+---
+
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T05:12:41.562997+00:00
+---
+
+- Resolution: Down (CORRECT) | Resolved at: 2026-02-23T05:12:41.563233+00:00
+---
+
+## BTC | February 23, 12:15AM-12:20AM ET
+
+- PTB: $65077.458721660274 | Close: $65058.42451656015 | Prediction: Down
+- Close RTDS ts: 1771824075000 | System read: 1771824077147 | Age: 2s
+- Diff: -$19.034205100120744 (0.029%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"65058424516560153000000","symbol":"btc/usd","timestamp":1771824075000,"value":65058.42451656015},"timestamp":1771824076148,"topic":"crypto_prices_chainlink","type":"update"}
+## ETH | February 23, 12:15AM-12:20AM ET
+
+- PTB: $1864.4603777363657 | Close: $1866.168396 | Prediction: Up
+- Close RTDS ts: 1771824075000 | System read: 1771824077148 | Age: 2s
+- Diff: +$1.708018263634358 (0.092%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"1866168396000000000000","symbol":"eth/usd","timestamp":1771824075000,"value":1866.168396},"timestamp":1771824076147,"topic":"crypto_prices_chainlink","type":"update"}
+## SOL | February 23, 12:15AM-12:20AM ET
+
+- PTB: $77.689445 | Close: $77.74831 | Prediction: Up
+- Close RTDS ts: 1771824075000 | System read: 1771824077148 | Age: 2s
+- Diff: +$0.05886499999999728 (0.076%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"77748310000000000000","symbol":"sol/usd","timestamp":1771824075000,"value":77.74831},"timestamp":1771824076164,"topic":"crypto_prices_chainlink","type":"update"}
+## XRP | February 23, 12:15AM-12:20AM ET
+
+- PTB: $1.342056 | Close: $1.3458635 | Prediction: Up
+- Close RTDS ts: 1771824075000 | System read: 1771824077148 | Age: 2s
+- Diff: +$0.0038075000000001857 (0.284%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"1345863500000000000","symbol":"xrp/usd","timestamp":1771824075000,"value":1.3458635},"timestamp":1771824076162,"topic":"crypto_prices_chainlink","type":"update"}
+- Resolution: TIMEOUT (predicted Down) | Timed out
+---
+
+- Resolution: TIMEOUT (predicted Up) | Timed out
+---
+
+- Resolution: TIMEOUT (predicted Up) | Timed out
+---
+
+- Resolution: TIMEOUT (predicted Up) | Timed out
+---
+
+## BTC | February 23, 12:30AM-12:35AM ET
+
+- PTB: $65026.20671288884 | Close: $65077.791834512005 | Prediction: Up
+- Close RTDS ts: 1771824899000 | System read: 1771824900913 | Age: 1s
+- Diff: +$51.58512162316765 (0.079%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"65077791834512005000000","symbol":"btc/usd","timestamp":1771824899000,"value":65077.791834512005},"timestamp":1771824900158,"topic":"crypto_prices_chainlink","type":"update"}
+## ETH | February 23, 12:30AM-12:35AM ET
+
+- PTB: $1866.4868762034707 | Close: $1868.13174 | Prediction: Up
+- Close RTDS ts: 1771824899000 | System read: 1771824900913 | Age: 1s
+- Diff: +$1.6448637965293074 (0.088%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"1868131740000000000000","symbol":"eth/usd","timestamp":1771824899000,"value":1868.13174},"timestamp":1771824900156,"topic":"crypto_prices_chainlink","type":"update"}
+## SOL | February 23, 12:30AM-12:35AM ET
+
+- PTB: $77.8172186831815 | Close: $77.9417460193916 | Prediction: Up
+- Close RTDS ts: 1771824899000 | System read: 1771824900914 | Age: 1s
+- Diff: +$0.12452733621010736 (0.160%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"77941746019391605000","symbol":"sol/usd","timestamp":1771824899000,"value":77.9417460193916},"timestamp":1771824900157,"topic":"crypto_prices_chainlink","type":"update"}
+## XRP | February 23, 12:30AM-12:35AM ET
+
+- PTB: $1.34181755 | Close: $1.3428355 | Prediction: Up
+- Close RTDS ts: 1771824899000 | System read: 1771824900915 | Age: 1s
+- Diff: +$0.0010179500000000452 (0.076%)
+- Raw RTDS: {"connection_id":"ZOAy3dlGrPECGJw=","payload":{"full_accuracy_value":"1342835500000000000","symbol":"xrp/usd","timestamp":1771824899000,"value":1.3428355},"timestamp":1771824900126,"topic":"crypto_prices_chainlink","type":"update"}
+## SOL | February 23, 12:40AM-12:45AM ET
+
+- PTB: $77.929216
+- Close: $77.9703635577166
+- Prediction: Up
+- Diff: +$0.041147557716598726 (0.053%)
+- Close RTDS ts: 1771825498000
+- System read: 1771825500152
+- Age: 2s
+- Raw RTDS: {"connection_id":"ZOEbyeXtLPECF3w=","payload":{"full_accuracy_value":"77970363557716595000","symbol":"sol/usd","timestamp":1771825498000,"value":77.9703635577166},"timestamp":1771825498732,"topic":"crypto_prices_chainlink","type":"update"}
+## XRP | February 23, 12:40AM-12:45AM ET
+
+- PTB: $1.3442319210451474
+- Close: $1.343238334323622
+- Prediction: Down
+- Diff: -$0.0009935867215253857 (0.074%)
+- Close RTDS ts: 1771825498000
+- System read: 1771825500153
+- Age: 2s
+- Raw RTDS: {"connection_id":"ZOEbyeXtLPECF3w=","payload":{"full_accuracy_value":"1343238334323622100","symbol":"xrp/usd","timestamp":1771825498000,"value":1.343238334323622},"timestamp":1771825498724,"topic":"crypto_prices_chainlink","type":"update"}

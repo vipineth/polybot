@@ -7,7 +7,7 @@ use crate::config::Config;
 use crate::discovery::{current_5m_period_start, parse_price_to_beat_from_question, MarketDiscovery, MARKET_5M_DURATION_SECS};
 use crate::log_buffer::LogBuffer;
 use crate::orderbook_ws::OrderbookMirror;
-use crate::paper_trade::PaperTradeLogger;
+use crate::paper_trade::{PaperTradeLogger, PredictionRecord};
 use crate::rtds::{LatestPriceCache, PriceCacheMulti};
 use anyhow::Result;
 use chrono::Utc;
@@ -127,11 +127,11 @@ impl ArbStrategy {
 
         let rtds_result = {
             let cache = self.latest_prices.read().await;
-            cache.get(symbol).copied()
+            cache.get(symbol).cloned()
         };
 
         let latest_price = match rtds_result {
-            Some((p, ts)) => {
+            Some((p, ts, _)) => {
                 let age = (now_ms - ts) / 1000;
                 debug!("Sweep {} RTDS WS: ${} (age={}s)", symbol, p, age);
                 p
@@ -375,15 +375,15 @@ impl ArbStrategy {
             info!("Period {} closed", period_5);
 
             // === Phase 6: Paper trade + sweep each symbol ===
+            let mut predictions: Vec<PredictionRecord> = Vec::new();
             for round in &rounds {
                 // Paper trade log
-                self.paper_trader
-                    .log(
-                        &self.config.strategy, &round.symbol, round.period_5,
-                        round.price_to_beat, &round.up_token, &round.down_token,
-                        &round.condition_id, &self.orderbook_mirror,
-                    )
-                    .await;
+                if let Some(pred) = self.paper_trader
+                    .log(&round.symbol, round.period_5, round.price_to_beat, &round.condition_id)
+                    .await
+                {
+                    predictions.push(pred);
+                }
 
                 // Sweep
                 if cfg.sweep_enabled {
@@ -406,7 +406,6 @@ impl ArbStrategy {
                 let symbol = round.symbol.clone();
                 let cid = round.condition_id.clone();
                 resolution_handles.push(tokio::spawn(async move {
-                    // Inline poll logic (can't use &self across spawn)
                     const INITIAL_DELAY: u64 = 60;
                     const POLL_INTERVAL: u64 = 45;
                     const MAX_WAIT: u64 = 600;
@@ -416,20 +415,21 @@ impl ArbStrategy {
                     loop {
                         if started.elapsed().as_secs() >= MAX_WAIT {
                             debug!("{} resolution timeout", symbol);
-                            break;
+                            return (symbol, None::<(String, String)>);
                         }
                         match api.get_market(&cid).await {
                             Ok(m) => {
                                 let winner = m.tokens.iter().find(|t| t.winner).map(|t| {
                                     if t.outcome.to_uppercase().contains("UP") || t.outcome == "1" {
-                                        "Up"
+                                        "Up".to_string()
                                     } else {
-                                        "Down"
+                                        "Down".to_string()
                                     }
                                 });
                                 if m.closed && winner.is_some() {
-                                    info!("{} resolved: {}", symbol, winner.unwrap_or("?"));
-                                    break;
+                                    let w = winner.unwrap();
+                                    info!("{} resolved: {}", symbol, w);
+                                    return (symbol, Some((w, m.question)));
                                 }
                             }
                             Err(e) => debug!("{} resolution poll failed: {}", symbol, e),
@@ -438,9 +438,17 @@ impl ArbStrategy {
                     }
                 }));
             }
-            // Wait for all resolutions
+            // Wait for all resolutions and log results
             for handle in resolution_handles {
-                let _ = handle.await;
+                if let Ok((symbol, result)) = handle.await {
+                    if let Some(pred) = predictions.iter().find(|p| p.symbol == symbol) {
+                        let (actual, question) = match &result {
+                            Some((w, q)) => (Some(w.as_str()), Some(q.as_str())),
+                            None => (None, None),
+                        };
+                        self.paper_trader.log_resolution(pred, actual, question).await;
+                    }
+                }
             }
 
             sleep(Duration::from_secs(5)).await;
